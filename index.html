@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NZ Newsstand</title>
+<style>
+  :root {
+    --bg-top: #4a250f;
+    --bg-bottom: #1d0f09;
+    --chrome-top: #7485a0;
+    --chrome-mid: #51637e;
+    --chrome-bottom: #344764;
+    --chrome-line: rgba(12, 20, 31, 0.88);
+    --chrome-text: #f6f8fb;
+    --chrome-shadow: rgba(8, 12, 18, 0.6);
+    --button-top: #93b0d1;
+    --button-mid: #6f90b8;
+    --button-bottom: #496a95;
+    --button-edge: #29415f;
+    --button-highlight: rgba(255, 255, 255, 0.5);
+    --button-pressed-top: #5576a0;
+    --button-pressed-bottom: #3d5d86;
+    --button-disabled-top: #7b8595;
+    --button-disabled-bottom: #5d6676;
+    --cover-border: rgba(70, 52, 36, 0.55);
+    --cover-shadow: rgba(31, 13, 3, 0.52);
+    --cover-sheen: rgba(255, 255, 255, 0.36);
+    --fallback-bg: rgba(245, 241, 230, 0.88);
+    --fallback-text: #5f5041;
+    --toast-bg: rgba(37, 26, 17, 0.82);
+    --toast-error: rgba(120, 32, 22, 0.92);
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    min-height: 100%;
+  }
+
+  body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    color: var(--chrome-text);
+    background:
+      radial-gradient(circle at top center, rgba(188, 103, 47, 0.32), transparent 36%),
+      linear-gradient(180deg, var(--bg-top) 0%, #2c150b 45%, var(--bg-bottom) 100%);
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .app-shell {
+    width: 100%;
+    margin: 0 auto;
+    padding: 10px 0 10px;
+  }
+
+  .control-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, transparent 28%),
+      linear-gradient(180deg, var(--chrome-top) 0%, var(--chrome-mid) 48%, var(--chrome-bottom) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      inset 0 -1px 0 rgba(12, 20, 31, 0.38),
+      0 16px 32px rgba(0, 0, 0, 0.28);
+    width: min(860px, calc(100vw - 20px));
+    margin: 0 auto 8px;
+  }
+
+  .ios6-btn,
+  .date-shell {
+    border-radius: 12px;
+    border: 1px solid var(--button-edge);
+    box-shadow:
+      inset 0 1px 0 var(--button-highlight),
+      inset 0 -1px 0 rgba(18, 29, 44, 0.35),
+      0 2px 0 rgba(12, 20, 31, 0.42);
+  }
+
+  .ios6-btn {
+    position: relative;
+    min-height: 40px;
+    padding: 0 16px;
+    color: var(--chrome-text);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-shadow: 0 -1px 0 rgba(10, 18, 26, 0.8);
+    border-radius: 12px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.06) 42%, transparent 42%),
+      linear-gradient(180deg, var(--button-top) 0%, var(--button-mid) 52%, var(--button-bottom) 100%);
+    cursor: pointer;
+  }
+
+  .ios6-btn:hover:not(:disabled) {
+    filter: brightness(1.04);
+  }
+
+  .ios6-btn:active:not(:disabled) {
+    transform: translateY(1px);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.03) 42%, transparent 42%),
+      linear-gradient(180deg, var(--button-pressed-top) 0%, var(--button-pressed-bottom) 100%);
+    box-shadow:
+      inset 0 2px 4px rgba(12, 20, 31, 0.36),
+      0 1px 0 rgba(12, 20, 31, 0.35);
+  }
+
+  .ios6-btn:disabled {
+    cursor: not-allowed;
+    color: rgba(245, 247, 250, 0.7);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.04) 42%, transparent 42%),
+      linear-gradient(180deg, var(--button-disabled-top) 0%, var(--button-disabled-bottom) 100%);
+    text-shadow: none;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      0 1px 0 rgba(12, 20, 31, 0.22);
+  }
+
+  .ios6-btn.is-today {
+    min-width: 84px;
+  }
+
+  .date-shell {
+    min-width: 208px;
+    padding: 0 12px;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.05) 36%, transparent 36%),
+      linear-gradient(180deg, #44546d 0%, #34445e 100%);
+  }
+
+  .date-shell input[type="date"] {
+    width: 100%;
+    min-height: 40px;
+    color: var(--chrome-text);
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    background: transparent;
+    border: 0;
+    outline: none;
+  }
+
+  .date-shell input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0.95;
+    cursor: pointer;
+    filter: invert(1) brightness(1.15);
+  }
+
+  .newsstand-scene {
+    position: relative;
+    aspect-ratio: 1672 / 941;
+    height: min(calc(100vh - 106px), calc(100vw * 941 / 1672));
+    width: auto;
+    max-width: 100vw;
+    margin: 0 auto;
+    border-radius: 0;
+    overflow: hidden;
+    background:
+      linear-gradient(180deg, rgba(33, 16, 7, 0.18), rgba(33, 16, 7, 0.05)),
+      url("./background-single.png") center center / cover no-repeat;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.12),
+      0 22px 44px rgba(0, 0, 0, 0.28);
+  }
+
+  .newsstand-scene::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, rgba(58, 23, 5, 0.18) 0%, transparent 24%, transparent 72%, rgba(26, 11, 3, 0.1) 100%);
+    pointer-events: none;
+  }
+
+  .shelf-papers {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+  }
+
+  .shelf-lip {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 80.1%;
+    height: 5.35%;
+    z-index: 4;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgba(255, 248, 222, 0.28) 0%, rgba(255, 248, 222, 0.06) 7%, transparent 7%),
+      linear-gradient(180deg, #e1a95d 0%, #cf934e 18%, #b87a38 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 245, 218, 0.62),
+      inset 0 -8px 18px rgba(105, 57, 17, 0.2);
+  }
+
+  .paper-card {
+    position: absolute;
+    left: var(--slot-left);
+    bottom: var(--slot-bottom);
+    width: var(--paper-width);
+    transform: translateX(-50%);
+  }
+
+  .paper-cover-wrap {
+    position: relative;
+    transform: rotate(var(--cover-rotate));
+    transform-origin: bottom center;
+    z-index: var(--slot-depth);
+  }
+
+  .paper-shadow {
+    position: absolute;
+    inset: auto 6% -6px 6%;
+    height: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0));
+    filter: blur(6px);
+    z-index: 0;
+  }
+
+  .paper-cover {
+    position: relative;
+    aspect-ratio: 5 / 7;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--cover-border);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(251, 249, 243, 0.98));
+    box-shadow:
+      0 16px 24px var(--cover-shadow),
+      inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  }
+
+  .paper-cover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(122deg, rgba(255, 255, 255, 0) 25%, var(--cover-sheen) 42%, rgba(255, 255, 255, 0) 59%);
+    opacity: 0.28;
+    pointer-events: none;
+  }
+
+  .paper-card.is-loading .paper-cover::after {
+    animation: sheen-slide 1.15s linear infinite;
+    opacity: 0.58;
+  }
+
+  @keyframes sheen-slide {
+    from {
+      transform: translateX(-42%);
+    }
+    to {
+      transform: translateX(46%);
+    }
+  }
+
+  .paper-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #f8f7f1;
+    opacity: 0;
+    transition: opacity 160ms ease;
+  }
+
+  .paper-image.is-visible {
+    opacity: 1;
+  }
+
+  .paper-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    text-align: center;
+    color: var(--fallback-text);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.3)),
+      repeating-linear-gradient(
+        180deg,
+        rgba(77, 62, 48, 0.06) 0,
+        rgba(77, 62, 48, 0.06) 1px,
+        transparent 1px,
+        transparent 8px
+      );
+  }
+
+  .paper-toast {
+    position: absolute;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: calc(100% - 28px);
+    padding: 8px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: #fdfdfd;
+    text-align: center;
+    background: var(--toast-bg);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+    z-index: 2;
+  }
+
+  .paper-toast.is-error {
+    background: var(--toast-error);
+  }
+
+  .paper-controls {
+    position: absolute;
+    top: calc(100% + 48px);
+    left: 50%;
+    transform: translateX(-50%);
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr) 38px;
+    gap: 6px;
+    align-items: center;
+    width: min(88%, 220px);
+    z-index: 6;
+  }
+
+  .ios6-mini {
+    min-height: 34px;
+    padding: 0;
+    font-size: 18px;
+    line-height: 1;
+  }
+
+  .page-indicator {
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 10px;
+    border-radius: 11px;
+    border: 1px solid rgba(39, 50, 69, 0.92);
+    color: #eff4fb;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-shadow: 0 -1px 0 rgba(10, 18, 26, 0.7);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.03) 44%, transparent 44%),
+      linear-gradient(180deg, #465874 0%, #34465f 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.24),
+      0 2px 0 rgba(12, 20, 31, 0.22);
+  }
+
+  .paper-card.is-loading .page-indicator {
+    color: #fbf3d3;
+  }
+
+  @media (max-width: 1080px) {
+    .app-shell {
+      width: min(100vw - 18px, 1440px);
+      padding-top: 10px;
+    }
+
+    .control-bar {
+      gap: 10px;
+    }
+
+    .ios6-btn {
+      padding: 0 14px;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .control-bar {
+      justify-content: stretch;
+      gap: 10px;
+    }
+
+    .date-shell {
+      order: -1;
+      width: 100%;
+    }
+
+    .ios6-btn {
+      flex: 1 1 calc(50% - 8px);
+    }
+
+    .newsstand-scene {
+      aspect-ratio: auto;
+      height: auto;
+      width: 100%;
+      max-width: none;
+      min-height: 700px;
+      background-position: center bottom;
+    }
+
+    .shelf-papers {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      gap: 14px;
+      padding: 64px 12px 108px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+    }
+
+    .shelf-papers::-webkit-scrollbar {
+      display: none;
+    }
+
+    .paper-card {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      width: min(55vw, 228px);
+      min-width: min(55vw, 228px);
+      transform: none;
+      flex: 0 0 auto;
+    }
+
+    .paper-controls {
+      top: calc(100% + 42px);
+      width: min(84%, 198px);
+    }
+  }
+
+  @media (max-width: 520px) {
+    .app-shell {
+      width: calc(100vw - 12px);
+      padding-bottom: 14px;
+    }
+
+    .control-bar {
+      padding: 12px;
+      border-radius: 18px;
+    }
+
+    .ios6-btn,
+    .date-shell input[type="date"] {
+      min-height: 42px;
+      font-size: 14px;
+    }
+
+    .newsstand-scene {
+      min-height: 620px;
+      border-radius: 0;
+    }
+
+    .shelf-papers {
+      padding: 54px 8px 96px;
+      gap: 10px;
+    }
+
+    .paper-card {
+      width: min(61vw, 236px);
+      min-width: min(61vw, 236px);
+    }
+
+    .page-indicator {
+      font-size: 11px;
+    }
+
+    .paper-controls {
+      top: calc(100% + 38px);
+    }
+  }
+</style>
+</head>
+<body>
+<main class="app-shell">
+  <h1 class="sr-only">New Zealand Newsstand</h1>
+
+  <header class="control-bar" aria-label="Edition date controls">
+    <button class="ios6-btn" id="prevDay" type="button" aria-label="Previous day">Prev Day</button>
+    <div class="date-shell">
+      <label class="sr-only" for="editionDate">Edition date in New Zealand</label>
+      <input type="date" id="editionDate">
+    </div>
+    <button class="ios6-btn is-today" id="todayBtn" type="button">Today</button>
+    <button class="ios6-btn" id="nextDay" type="button" aria-label="Next day">Next Day</button>
+  </header>
+
+  <section class="newsstand-scene" id="scene" aria-live="polite">
+    <div class="shelf-papers" id="shelf"></div>
+    <div class="shelf-lip" aria-hidden="true"></div>
+  </section>
+</main>
+
+<script>
+const NZ_TIME_ZONE = "Pacific/Auckland";
+const SCALE = 70;
+const SLOT_LAYOUTS = {
+  3: [
+    { left: "17.2%", width: "26.8%", rotate: "0deg", bottom: "19.8%", depth: 2 },
+    { left: "50%", width: "26.8%", rotate: "0deg", bottom: "19.8%", depth: 3 },
+    { left: "82.8%", width: "26.8%", rotate: "0deg", bottom: "19.8%", depth: 2 }
+  ],
+  2: [
+    { left: "33.8%", width: "29.8%", rotate: "0deg", bottom: "20%", depth: 2 },
+    { left: "66.2%", width: "29.8%", rotate: "0deg", bottom: "20%", depth: 2 }
+  ]
+};
+
+const EDITION_CONFIG = {
+  weekday: [
+    { id: "1126", title: "New Zealand Herald" },
+    { id: "1022", title: "The Post" },
+    { id: "1272", title: "The Press" }
+  ],
+  saturday: [
+    { id: "7478", title: "Weekend Herald" },
+    { id: "1022", title: "The Post" },
+    { id: "1272", title: "The Press" }
+  ],
+  sunday: [
+    { id: "1211", title: "Herald on Sunday" },
+    { id: "1543", title: "Sunday Star-Times" }
+  ]
+};
+
+const els = {
+  editionDate: document.getElementById("editionDate"),
+  prevDay: document.getElementById("prevDay"),
+  todayBtn: document.getElementById("todayBtn"),
+  nextDay: document.getElementById("nextDay"),
+  scene: document.getElementById("scene"),
+  shelf: document.getElementById("shelf")
+};
+
+let currentDate = formatNzDate(new Date());
+let currentEditions = [];
+let pageStateByEditionId = new Map();
+
+function formatNzDate(date) {
+  const parts = new Intl.DateTimeFormat("en-NZ", {
+    timeZone: NZ_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(date);
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function getNzWeekday(date) {
+  const [year, month, day] = String(date).split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
+}
+
+function shiftDate(date, offset) {
+  const [year, month, day] = String(date).split("-").map(Number);
+  const shifted = new Date(Date.UTC(year, month - 1, day));
+  shifted.setUTCDate(shifted.getUTCDate() + offset);
+  return formatUtcDate(shifted);
+}
+
+function formatUtcDate(date) {
+  return [
+    date.getUTCFullYear(),
+    String(date.getUTCMonth() + 1).padStart(2, "0"),
+    String(date.getUTCDate()).padStart(2, "0")
+  ].join("-");
+}
+
+function resolveEditionsForDate(date) {
+  const weekday = getNzWeekday(date);
+  if (weekday === 0) return EDITION_CONFIG.sunday;
+  if (weekday === 6) return EDITION_CONFIG.saturday;
+  return EDITION_CONFIG.weekday;
+}
+
+function buildFrontPageUrl(edition, date, page) {
+  const issueDate = String(date).replace(/-/g, "");
+  const file = `${edition.id}${issueDate}00000000001001`;
+  return `https://t.prcdn.co/img?file=${file}&page=${page}&scale=${SCALE}`;
+}
+
+function createPageState() {
+  return {
+    page: 1,
+    lastSuccessfulPage: 1,
+    hasLoaded: false,
+    loading: false,
+    requestId: 0,
+    flashTimer: null
+  };
+}
+
+function clearPageTimers() {
+  pageStateByEditionId.forEach((state) => {
+    if (state.flashTimer) {
+      window.clearTimeout(state.flashTimer);
+      state.flashTimer = null;
+    }
+  });
+}
+
+function getSlots(count) {
+  return SLOT_LAYOUTS[count] || SLOT_LAYOUTS[3];
+}
+
+function setPaperMessage(card, state, text, kind, persist) {
+  const toast = card.querySelector(".paper-toast");
+  if (state.flashTimer) {
+    window.clearTimeout(state.flashTimer);
+    state.flashTimer = null;
+  }
+  toast.textContent = text;
+  toast.hidden = false;
+  toast.classList.toggle("is-error", kind === "error");
+  if (!persist) {
+    state.flashTimer = window.setTimeout(() => {
+      toast.hidden = true;
+      toast.textContent = "";
+      state.flashTimer = null;
+    }, 1500);
+  }
+}
+
+function hidePaperMessage(card, state) {
+  const toast = card.querySelector(".paper-toast");
+  if (state.flashTimer) {
+    window.clearTimeout(state.flashTimer);
+    state.flashTimer = null;
+  }
+  toast.hidden = true;
+  toast.textContent = "";
+  toast.classList.remove("is-error");
+}
+
+function updatePaperControls(card, state) {
+  const prevButton = card.querySelector('[data-action="prev"]');
+  const nextButton = card.querySelector('[data-action="next"]');
+  const indicator = card.querySelector(".page-indicator");
+  indicator.textContent = `Page ${state.page}`;
+  prevButton.disabled = state.loading || state.page <= 1;
+  nextButton.disabled = state.loading;
+  card.classList.toggle("is-loading", state.loading);
+}
+
+function setPaperFallback(card, title) {
+  const fallback = card.querySelector(".paper-fallback");
+  fallback.textContent = title;
+  fallback.hidden = false;
+}
+
+function clearPaperFallback(card) {
+  const fallback = card.querySelector(".paper-fallback");
+  fallback.hidden = true;
+}
+
+function createPaperCard(edition, slot) {
+  const card = document.createElement("article");
+  card.className = "paper-card";
+  card.dataset.editionId = edition.id;
+  card.style.setProperty("--slot-left", slot.left);
+  card.style.setProperty("--paper-width", slot.width);
+  card.style.setProperty("--cover-rotate", slot.rotate);
+  card.style.setProperty("--slot-bottom", slot.bottom);
+  card.style.setProperty("--slot-depth", slot.depth);
+  card.innerHTML = `
+    <div class="paper-cover-wrap">
+      <div class="paper-shadow"></div>
+      <div class="paper-cover">
+        <img class="paper-image" alt="${edition.title}">
+        <div class="paper-fallback">Loading page 1</div>
+        <div class="paper-toast" hidden></div>
+      </div>
+    </div>
+    <div class="paper-controls">
+      <button class="ios6-btn ios6-mini" type="button" data-action="prev" aria-label="Previous page for ${edition.title}">‹</button>
+      <div class="page-indicator" aria-label="${edition.title} current page">Page 1</div>
+      <button class="ios6-btn ios6-mini" type="button" data-action="next" aria-label="Next page for ${edition.title}">›</button>
+    </div>
+  `;
+
+  card.querySelector('[data-action="prev"]').addEventListener("click", () => {
+    changePaperPage(edition.id, -1);
+  });
+  card.querySelector('[data-action="next"]').addEventListener("click", () => {
+    changePaperPage(edition.id, 1);
+  });
+
+  return card;
+}
+
+function applySuccessfulPaperLoad(card, edition, state, targetPage, url) {
+  if (!card.isConnected) return;
+  const img = card.querySelector(".paper-image");
+  state.loading = false;
+  state.page = targetPage;
+  state.lastSuccessfulPage = targetPage;
+  state.hasLoaded = true;
+  img.src = url;
+  img.alt = `${edition.title} page ${targetPage} for ${currentDate}`;
+  img.classList.add("is-visible");
+  clearPaperFallback(card);
+  hidePaperMessage(card, state);
+  updatePaperControls(card, state);
+}
+
+function handlePaperLoadFailure(card, state, targetPage) {
+  if (!card.isConnected) return;
+  state.loading = false;
+  state.page = state.hasLoaded ? state.lastSuccessfulPage : 1;
+  updatePaperControls(card, state);
+
+  if (!state.hasLoaded) {
+    setPaperFallback(card, "Issue unavailable");
+    return;
+  }
+
+  setPaperMessage(card, state, `Page ${targetPage} unavailable`, "error", false);
+}
+
+function loadPaperPage(card, edition, date, state, targetPage) {
+  if (!card || state.loading) return;
+
+  state.loading = true;
+  state.page = targetPage;
+  updatePaperControls(card, state);
+  const url = buildFrontPageUrl(edition, date, targetPage);
+  const requestId = state.requestId + 1;
+  state.requestId = requestId;
+
+  if (state.hasLoaded) {
+    setPaperMessage(card, state, `Loading page ${targetPage}`, "info", true);
+  } else {
+    setPaperFallback(card, `Loading page ${targetPage}`);
+  }
+
+  const probe = new Image();
+  probe.decoding = "async";
+  probe.onload = () => {
+    if (state.requestId !== requestId) return;
+    applySuccessfulPaperLoad(card, edition, state, targetPage, url);
+  };
+  probe.onerror = () => {
+    if (state.requestId !== requestId) return;
+    handlePaperLoadFailure(card, state, targetPage);
+  };
+  probe.src = url;
+}
+
+function changePaperPage(editionId, delta) {
+  const state = pageStateByEditionId.get(editionId);
+  const edition = currentEditions.find((item) => item.id === editionId);
+  const card = els.shelf.querySelector(`[data-edition-id="${editionId}"]`);
+  if (!state || !edition || !card) return;
+
+  const targetPage = Math.max(1, state.page + delta);
+  if (targetPage === state.page || state.loading) return;
+  loadPaperPage(card, edition, currentDate, state, targetPage);
+}
+
+function renderShelf(date) {
+  clearPageTimers();
+  currentDate = date;
+  currentEditions = resolveEditionsForDate(date);
+  pageStateByEditionId = new Map(currentEditions.map((edition) => [edition.id, createPageState()]));
+  els.scene.dataset.count = String(currentEditions.length);
+  els.shelf.innerHTML = "";
+
+  const slots = getSlots(currentEditions.length);
+  currentEditions.forEach((edition, index) => {
+    const card = createPaperCard(edition, slots[index]);
+    els.shelf.appendChild(card);
+  });
+
+  currentEditions.forEach((edition) => {
+    const state = pageStateByEditionId.get(edition.id);
+    const card = els.shelf.querySelector(`[data-edition-id="${edition.id}"]`);
+    updatePaperControls(card, state);
+    loadPaperPage(card, edition, currentDate, state, 1);
+  });
+}
+
+function renderCurrentDate() {
+  renderShelf(els.editionDate.value);
+}
+
+els.editionDate.value = currentDate;
+els.prevDay.addEventListener("click", () => {
+  els.editionDate.value = shiftDate(els.editionDate.value, -1);
+  renderCurrentDate();
+});
+els.todayBtn.addEventListener("click", () => {
+  els.editionDate.value = formatNzDate(new Date());
+  renderCurrentDate();
+});
+els.nextDay.addEventListener("click", () => {
+  els.editionDate.value = shiftDate(els.editionDate.value, 1);
+  renderCurrentDate();
+});
+els.editionDate.addEventListener("change", renderCurrentDate);
+
+renderShelf(currentDate);
+</script>
+</body>
+</html>
