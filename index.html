@@ -336,6 +336,7 @@
     background: #f8f7f1;
     opacity: 0;
     transition: opacity 160ms ease;
+    cursor: zoom-in;
   }
 
   .paper-image.is-visible {
@@ -429,6 +430,92 @@
 
   .paper-card.is-loading .page-indicator {
     color: #fbf3d3;
+  }
+
+  .lightbox {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+    background: rgba(15, 10, 6, 0.78);
+    z-index: 20;
+  }
+
+  .lightbox[hidden] {
+    display: none !important;
+  }
+
+  .lightbox-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    font-size: 16px;
+    color: #fff;
+    line-height: 1;
+    z-index: 1;
+    background: rgba(15, 10, 6, 0.56);
+    box-shadow: none;
+    text-shadow: none;
+  }
+
+  .lightbox-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    min-width: 38px;
+    min-height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    font-size: 18px;
+    line-height: 1;
+    color: #fff;
+    background: rgba(15, 10, 6, 0.42);
+    box-shadow: none;
+    text-shadow: none;
+    z-index: 1;
+  }
+
+  .lightbox-nav:disabled {
+    opacity: 0.38;
+    cursor: default;
+  }
+
+  .lightbox-nav-prev {
+    left: 16px;
+  }
+
+  .lightbox-nav-next {
+    right: 16px;
+  }
+
+  .lightbox-spread {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+    width: min(94vw, 1200px);
+    max-width: 100%;
+  }
+
+  .lightbox-spread.is-cover {
+    grid-template-columns: minmax(0, 1fr);
+    width: min(92vw, 900px);
+  }
+
+  .lightbox-image {
+    display: block;
+    width: 100%;
+    max-height: 92vh;
+    object-fit: contain;
+    background: transparent;
+    box-shadow: 0 20px 44px rgba(0, 0, 0, 0.34);
   }
 
   @media (max-width: 1080px) {
@@ -542,6 +629,27 @@
     .paper-controls {
       top: calc(100% + 38px);
     }
+
+    .lightbox {
+      padding: 18px 10px;
+    }
+
+    .lightbox-spread {
+      gap: 6px;
+    }
+
+    .lightbox-close {
+      top: 10px;
+      right: 10px;
+    }
+
+    .lightbox-nav-prev {
+      left: 8px;
+    }
+
+    .lightbox-nav-next {
+      right: 8px;
+    }
   }
 </style>
 </head>
@@ -565,9 +673,20 @@
   </section>
 </main>
 
+<div class="lightbox" id="lightbox" hidden>
+  <button class="lightbox-nav lightbox-nav-prev" id="lightboxPrev" type="button" aria-label="Previous page">&lt;</button>
+  <button class="lightbox-nav lightbox-nav-next" id="lightboxNext" type="button" aria-label="Next page">&gt;</button>
+  <button class="lightbox-close" id="lightboxClose" type="button" aria-label="Close expanded newspaper page">X</button>
+  <div class="lightbox-spread is-cover" id="lightboxSpread" role="dialog" aria-modal="true" aria-label="Expanded newspaper page">
+    <img class="lightbox-image" id="lightboxImageLeft" alt="">
+    <img class="lightbox-image" id="lightboxImageRight" alt="" hidden>
+  </div>
+</div>
+
 <script>
 const NZ_TIME_ZONE = "Pacific/Auckland";
 const SCALE = 70;
+const COVER_SCALE = 100;
 const SLOT_LAYOUTS = {
   3: [
     { left: "17.2%", width: "26.8%", rotate: "0deg", bottom: "19.8%", depth: 2 },
@@ -603,12 +722,23 @@ const els = {
   todayBtn: document.getElementById("todayBtn"),
   nextDay: document.getElementById("nextDay"),
   scene: document.getElementById("scene"),
-  shelf: document.getElementById("shelf")
+  shelf: document.getElementById("shelf"),
+  lightbox: document.getElementById("lightbox"),
+  lightboxPrev: document.getElementById("lightboxPrev"),
+  lightboxNext: document.getElementById("lightboxNext"),
+  lightboxClose: document.getElementById("lightboxClose"),
+  lightboxSpread: document.getElementById("lightboxSpread"),
+  lightboxImageLeft: document.getElementById("lightboxImageLeft"),
+  lightboxImageRight: document.getElementById("lightboxImageRight")
 };
 
 let currentDate = formatNzDate(new Date());
 let currentEditions = [];
 let pageStateByEditionId = new Map();
+let lightboxEditionId = null;
+let lightboxPage = 1;
+let lightboxLoading = false;
+let lightboxRequestId = 0;
 
 function formatNzDate(date) {
   const parts = new Intl.DateTimeFormat("en-NZ", {
@@ -651,7 +781,8 @@ function resolveEditionsForDate(date) {
 function buildFrontPageUrl(edition, date, page) {
   const issueDate = String(date).replace(/-/g, "");
   const file = `${edition.id}${issueDate}00000000001001`;
-  return `https://t.prcdn.co/img?file=${file}&page=${page}&scale=${SCALE}`;
+  const scale = page === 1 ? COVER_SCALE : SCALE;
+  return `https://t.prcdn.co/img?file=${file}&page=${page}&scale=${scale}`;
 }
 
 function createPageState() {
@@ -715,6 +846,9 @@ function updatePaperControls(card, state) {
   prevButton.disabled = state.loading || state.page <= 1;
   nextButton.disabled = state.loading;
   card.classList.toggle("is-loading", state.loading);
+  if (card.dataset.editionId === lightboxEditionId) {
+    updateLightboxControls();
+  }
 }
 
 function setPaperFallback(card, title) {
@@ -726,6 +860,150 @@ function setPaperFallback(card, title) {
 function clearPaperFallback(card) {
   const fallback = card.querySelector(".paper-fallback");
   fallback.hidden = true;
+}
+
+function getEditionById(editionId) {
+  return currentEditions.find((item) => item.id === editionId) || null;
+}
+
+function buildPageAltText(edition, page) {
+  return `${edition.title} page ${page} for ${currentDate}`;
+}
+
+function normalizeLightboxPage(page) {
+  const normalized = Math.max(1, Number(page) || 1);
+  if (normalized === 1) return 1;
+  return normalized % 2 === 0 ? normalized : normalized - 1;
+}
+
+function clearLightboxPages() {
+  els.lightboxSpread.classList.add("is-cover");
+  els.lightboxSpread.setAttribute("aria-label", "Expanded newspaper page");
+  els.lightboxImageLeft.hidden = true;
+  els.lightboxImageLeft.src = "";
+  els.lightboxImageLeft.alt = "";
+  els.lightboxImageRight.hidden = true;
+  els.lightboxImageRight.src = "";
+  els.lightboxImageRight.alt = "";
+}
+
+function setLightboxPages(leftSrc, leftAlt, rightSrc, rightAlt) {
+  const hasRightPage = Boolean(rightSrc);
+  els.lightboxSpread.classList.toggle("is-cover", !hasRightPage);
+  els.lightboxSpread.setAttribute("aria-label", hasRightPage ? "Expanded newspaper spread" : "Expanded newspaper page");
+  els.lightboxImageLeft.hidden = !leftSrc;
+  els.lightboxImageLeft.src = leftSrc || "";
+  els.lightboxImageLeft.alt = leftAlt || "";
+  els.lightboxImageRight.hidden = !hasRightPage;
+  els.lightboxImageRight.src = rightSrc || "";
+  els.lightboxImageRight.alt = rightAlt || "";
+}
+
+function updateLightboxControls() {
+  const hasEdition = Boolean(lightboxEditionId);
+  els.lightboxPrev.disabled = !hasEdition || lightboxLoading || lightboxPage <= 1;
+  els.lightboxNext.disabled = !hasEdition || lightboxLoading;
+}
+
+function loadLightboxImage(url) {
+  return new Promise((resolve, reject) => {
+    const probe = new Image();
+    probe.decoding = "async";
+    probe.onload = () => resolve(url);
+    probe.onerror = () => reject(new Error(`Failed to load ${url}`));
+    probe.src = url;
+  });
+}
+
+function loadLightboxSpread(editionId, targetPage) {
+  const edition = getEditionById(editionId);
+  if (!edition) return;
+
+  const startPage = normalizeLightboxPage(targetPage);
+  const requestId = lightboxRequestId + 1;
+  lightboxRequestId = requestId;
+  lightboxLoading = true;
+  updateLightboxControls();
+
+  const leftUrl = buildFrontPageUrl(edition, currentDate, startPage);
+  const leftAlt = buildPageAltText(edition, startPage);
+
+  if (startPage === 1) {
+    loadLightboxImage(leftUrl)
+      .then(() => {
+        if (lightboxRequestId !== requestId) return;
+        lightboxPage = 1;
+        lightboxLoading = false;
+        setLightboxPages(leftUrl, leftAlt, "", "");
+        updateLightboxControls();
+      })
+      .catch(() => {
+        if (lightboxRequestId !== requestId) return;
+        lightboxLoading = false;
+        updateLightboxControls();
+      });
+    return;
+  }
+
+  const rightPage = startPage + 1;
+  const rightUrl = buildFrontPageUrl(edition, currentDate, rightPage);
+  const rightAlt = buildPageAltText(edition, rightPage);
+
+  loadLightboxImage(leftUrl)
+    .then(() => loadLightboxImage(rightUrl).then(() => true).catch(() => false))
+    .then((hasRightPage) => {
+      if (lightboxRequestId !== requestId) return;
+      lightboxPage = startPage;
+      lightboxLoading = false;
+      setLightboxPages(leftUrl, leftAlt, hasRightPage ? rightUrl : "", hasRightPage ? rightAlt : "");
+      updateLightboxControls();
+    })
+    .catch(() => {
+      if (lightboxRequestId !== requestId) return;
+      lightboxLoading = false;
+      updateLightboxControls();
+    });
+}
+
+function changeLightboxPage(delta) {
+  if (!lightboxEditionId || lightboxLoading) return;
+  const targetPage = delta < 0
+    ? (lightboxPage <= 2 ? 1 : lightboxPage - 2)
+    : (lightboxPage === 1 ? 2 : lightboxPage + 2);
+
+  if (targetPage === lightboxPage) return;
+  loadLightboxSpread(lightboxEditionId, targetPage);
+}
+
+function openLightbox(editionId, src, alt) {
+  const state = pageStateByEditionId.get(editionId);
+  const startPage = normalizeLightboxPage(state ? state.page : 1);
+  lightboxEditionId = editionId;
+  lightboxPage = startPage;
+  lightboxLoading = false;
+  els.lightbox.hidden = false;
+  document.body.style.overflow = "hidden";
+
+  if (startPage === 1 && src) {
+    setLightboxPages(src, alt || "", "", "");
+  } else {
+    clearLightboxPages();
+    loadLightboxSpread(editionId, startPage);
+  }
+
+  updateLightboxControls();
+  els.lightboxClose.focus();
+}
+
+function closeLightbox() {
+  lightboxEditionId = null;
+  lightboxPage = 1;
+  lightboxLoading = false;
+  lightboxRequestId += 1;
+  els.lightbox.hidden = true;
+  clearLightboxPages();
+  document.body.style.overflow = "";
+  updateLightboxControls();
 }
 
 function createPaperCard(edition, slot) {
@@ -747,9 +1025,9 @@ function createPaperCard(edition, slot) {
       </div>
     </div>
     <div class="paper-controls">
-      <button class="ios6-btn ios6-mini" type="button" data-action="prev" aria-label="Previous page for ${edition.title}">‹</button>
+      <button class="ios6-btn ios6-mini" type="button" data-action="prev" aria-label="Previous page for ${edition.title}">&lt;</button>
       <div class="page-indicator" aria-label="${edition.title} current page">Page 1</div>
-      <button class="ios6-btn ios6-mini" type="button" data-action="next" aria-label="Next page for ${edition.title}">›</button>
+      <button class="ios6-btn ios6-mini" type="button" data-action="next" aria-label="Next page for ${edition.title}">&gt;</button>
     </div>
   `;
 
@@ -758,6 +1036,11 @@ function createPaperCard(edition, slot) {
   });
   card.querySelector('[data-action="next"]').addEventListener("click", () => {
     changePaperPage(edition.id, 1);
+  });
+  card.querySelector(".paper-image").addEventListener("click", (event) => {
+    const img = event.currentTarget;
+    if (!img.classList.contains("is-visible") || !img.src) return;
+    openLightbox(edition.id, img.src, img.alt);
   });
 
   return card;
@@ -771,7 +1054,7 @@ function applySuccessfulPaperLoad(card, edition, state, targetPage, url) {
   state.lastSuccessfulPage = targetPage;
   state.hasLoaded = true;
   img.src = url;
-  img.alt = `${edition.title} page ${targetPage} for ${currentDate}`;
+  img.alt = buildPageAltText(edition, targetPage);
   img.classList.add("is-visible");
   clearPaperFallback(card);
   hidePaperMessage(card, state);
@@ -872,6 +1155,33 @@ els.nextDay.addEventListener("click", () => {
   renderCurrentDate();
 });
 els.editionDate.addEventListener("change", renderCurrentDate);
+els.lightboxPrev.addEventListener("click", () => {
+  changeLightboxPage(-1);
+});
+els.lightboxNext.addEventListener("click", () => {
+  changeLightboxPage(1);
+});
+els.lightboxClose.addEventListener("click", closeLightbox);
+els.lightbox.addEventListener("click", (event) => {
+  if (event.target === els.lightbox) {
+    closeLightbox();
+  }
+});
+document.addEventListener("keydown", (event) => {
+  if (!els.lightbox.hidden && (event.key === "ArrowLeft" || event.key === "Left")) {
+    event.preventDefault();
+    changeLightboxPage(-1);
+    return;
+  }
+  if (!els.lightbox.hidden && (event.key === "ArrowRight" || event.key === "Right")) {
+    event.preventDefault();
+    changeLightboxPage(1);
+    return;
+  }
+  if (event.key === "Escape" && !els.lightbox.hidden) {
+    closeLightbox();
+  }
+});
 
 renderShelf(currentDate);
 </script>
