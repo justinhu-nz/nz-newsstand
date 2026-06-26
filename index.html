@@ -2,7 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#3a1b0b">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>NZ Newsstand</title>
 <style>
   :root {
@@ -40,6 +44,8 @@
   body {
     margin: 0;
     min-height: 100%;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
@@ -47,6 +53,7 @@
     color: var(--chrome-text);
     position: relative;
     overflow-x: hidden;
+    overscroll-behavior-y: contain;
     background:
       radial-gradient(circle at 50% 18%, rgba(205, 141, 78, 0.24), transparent 30%),
       radial-gradient(circle at 50% 58%, rgba(148, 84, 34, 0.2), transparent 38%),
@@ -73,6 +80,17 @@
   button,
   input {
     font: inherit;
+  }
+
+  button,
+  input,
+  .paper-image {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button,
+  .paper-image {
+    touch-action: manipulation;
   }
 
   [hidden] {
@@ -534,9 +552,21 @@
   }
 
   @media (max-width: 860px) {
+    .app-shell {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding-top: calc(8px + env(safe-area-inset-top));
+      padding-bottom: calc(10px + env(safe-area-inset-bottom));
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
+
     .control-bar {
       justify-content: stretch;
       gap: 10px;
+      flex: 0 0 auto;
     }
 
     .date-shell {
@@ -545,7 +575,9 @@
     }
 
     .ios6-btn {
-      flex: 1 1 calc(50% - 8px);
+      flex: 1 1 0;
+      min-width: 0;
+      padding: 0 8px;
     }
 
     .newsstand-scene {
@@ -553,21 +585,36 @@
       height: auto;
       width: 100%;
       max-width: none;
-      min-height: 700px;
-      background-position: center bottom;
+      flex: 1 1 auto;
+      min-height: 440px;
+      background: none;
+      box-shadow: none;
+      overflow: visible;
+    }
+
+    /* Drop the decorative shelf on phones — papers read better on the plain backdrop. */
+    .newsstand-scene::before,
+    .newsstand-scene::after,
+    .shelf-lip {
+      display: none;
     }
 
     .shelf-papers {
       position: absolute;
       inset: 0;
       display: flex;
-      align-items: flex-end;
+      align-items: center;
       justify-content: flex-start;
       gap: 14px;
-      padding: 64px 12px 108px;
+      padding: 8px 0;
+      padding-inline: calc((100% - min(82vw, 360px, 60dvh)) / 2);
       overflow-x: auto;
       overflow-y: hidden;
       scrollbar-width: none;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      overscroll-behavior-x: contain;
+      -webkit-overflow-scrolling: touch;
     }
 
     .shelf-papers::-webkit-scrollbar {
@@ -578,77 +625,112 @@
       position: relative;
       left: auto;
       bottom: auto;
-      width: min(55vw, 228px);
-      min-width: min(55vw, 228px);
+      width: min(82vw, 360px, 60dvh);
+      min-width: min(82vw, 360px, 60dvh);
       transform: none;
       flex: 0 0 auto;
+      scroll-snap-align: center;
+      scroll-snap-stop: always;
     }
 
     .paper-controls {
-      top: calc(100% + 42px);
-      width: min(84%, 198px);
+      top: calc(100% + 18px);
+      width: min(86%, 220px);
     }
   }
 
   @media (max-width: 520px) {
     .app-shell {
-      width: calc(100vw - 12px);
-      padding-bottom: 14px;
+      width: 100%;
     }
 
     .control-bar {
       padding: 12px;
       border-radius: 18px;
+      width: min(560px, calc(100vw - 16px - env(safe-area-inset-left) - env(safe-area-inset-right)));
     }
 
     .ios6-btn,
     .date-shell input[type="date"] {
-      min-height: 42px;
-      font-size: 14px;
+      min-height: 44px;
+      font-size: 15px;
     }
 
     .newsstand-scene {
-      min-height: 620px;
       border-radius: 0;
     }
 
     .shelf-papers {
-      padding: 54px 8px 96px;
-      gap: 10px;
+      padding-top: 8px;
+      padding-bottom: 8px;
+      gap: 12px;
     }
 
-    .paper-card {
-      width: min(61vw, 236px);
-      min-width: min(61vw, 236px);
+    .ios6-mini {
+      min-height: 40px;
+      font-size: 20px;
     }
 
     .page-indicator {
-      font-size: 11px;
+      min-height: 40px;
+      font-size: 12px;
     }
 
     .paper-controls {
-      top: calc(100% + 38px);
+      top: calc(100% + 26px);
     }
+  }
 
+  /* Phone reader: one full-width page at a time, thumb-reachable controls. */
+  @media (max-width: 700px) {
     .lightbox {
-      padding: 4px;
+      padding: 0;
     }
 
-    .lightbox-spread {
-      gap: 6px;
+    .lightbox-spread,
+    .lightbox-spread.is-cover {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0;
+      width: 100vw;
+      padding: 0 6px;
+      place-items: center;
+    }
+
+    .lightbox-image {
+      max-height: 98vh;
+      max-height: calc(100dvh - 12px);
+      box-shadow: none;
     }
 
     .lightbox-close {
-      top: 10px;
-      right: 10px;
+      top: calc(10px + env(safe-area-inset-top));
+      right: calc(10px + env(safe-area-inset-right));
+      min-width: 44px;
+      min-height: 44px;
+      font-size: 17px;
+      background: rgba(15, 10, 6, 0.62);
+    }
+
+    .lightbox-nav {
+      top: auto;
+      bottom: calc(14px + env(safe-area-inset-bottom));
+      transform: none;
+      min-width: 52px;
+      min-height: 52px;
+      font-size: 22px;
+      background: rgba(15, 10, 6, 0.55);
+    }
+
+    .lightbox-nav:active:not(:disabled) {
+      background: rgba(15, 10, 6, 0.78);
     }
 
     .lightbox-nav-prev {
-      left: 8px;
+      left: calc(16px + env(safe-area-inset-left));
     }
 
     .lightbox-nav-next {
-      right: 8px;
+      right: calc(16px + env(safe-area-inset-right));
     }
   }
 </style>
@@ -877,9 +959,15 @@ function buildPageAltText(edition, page) {
   return `${edition.title} page ${page} for ${currentDate}`;
 }
 
+function isMobileLightbox() {
+  // Phones read one page at a time; a two-page spread is unreadable at phone widths.
+  return window.matchMedia("(max-width: 700px)").matches;
+}
+
 function normalizeLightboxPage(page) {
   // Fullscreen mode treats page 1 as a standalone cover and subsequent navigation as even-numbered spreads.
   const normalized = Math.max(1, Number(page) || 1);
+  if (isMobileLightbox()) return normalized;
   if (normalized === 1) return 1;
   return normalized % 2 === 0 ? normalized : normalized - 1;
 }
@@ -937,7 +1025,7 @@ function loadLightboxSpread(editionId, targetPage) {
   const leftUrl = buildFrontPageUrl(edition, currentDate, startPage);
   const leftAlt = buildPageAltText(edition, startPage);
 
-  if (startPage === 1) {
+  if (startPage === 1 || isMobileLightbox()) {
     loadLightboxImage(leftUrl)
       .then(() => {
         if (lightboxRequestId !== requestId) return;
@@ -977,10 +1065,12 @@ function loadLightboxSpread(editionId, targetPage) {
 
 function changeLightboxPage(delta) {
   if (!lightboxEditionId || lightboxLoading) return;
-  // Spread navigation steps 1 -> 2-3 -> 4-5 and back again rather than moving one page at a time.
-  const targetPage = delta < 0
-    ? (lightboxPage <= 2 ? 1 : lightboxPage - 2)
-    : (lightboxPage === 1 ? 2 : lightboxPage + 2);
+  // Phones step one page at a time; wider screens step 1 -> 2-3 -> 4-5 spreads.
+  const targetPage = isMobileLightbox()
+    ? Math.max(1, lightboxPage + delta)
+    : delta < 0
+      ? (lightboxPage <= 2 ? 1 : lightboxPage - 2)
+      : (lightboxPage === 1 ? 2 : lightboxPage + 2);
 
   if (targetPage === lightboxPage) return;
   loadLightboxSpread(lightboxEditionId, targetPage);
@@ -1187,6 +1277,30 @@ els.lightbox.addEventListener("click", (event) => {
     closeLightbox();
   }
 });
+
+// Horizontal swipe pages the reader on touch devices; pinch (multi-touch) is ignored so zoom still works.
+let touchStartX = 0;
+let touchStartY = 0;
+let touchTracking = false;
+els.lightboxSpread.addEventListener("touchstart", (event) => {
+  if (event.touches.length !== 1) {
+    touchTracking = false;
+    return;
+  }
+  touchStartX = event.touches[0].clientX;
+  touchStartY = event.touches[0].clientY;
+  touchTracking = true;
+}, { passive: true });
+els.lightboxSpread.addEventListener("touchend", (event) => {
+  if (!touchTracking) return;
+  touchTracking = false;
+  const touch = event.changedTouches[0];
+  const dx = touch.clientX - touchStartX;
+  const dy = touch.clientY - touchStartY;
+  // Require a clearly horizontal flick so vertical scroll/pinch is not mistaken for paging.
+  if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.4) return;
+  changeLightboxPage(dx < 0 ? 1 : -1);
+}, { passive: true });
 document.addEventListener("keydown", (event) => {
   // Fullscreen shortcuts take precedence; otherwise the same arrows page every visible paper on the shelf.
   if (!els.lightbox.hidden && (event.key === "ArrowLeft" || event.key === "Left")) {
