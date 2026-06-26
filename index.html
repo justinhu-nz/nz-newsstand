@@ -437,7 +437,7 @@
     inset: 0;
     display: grid;
     place-items: center;
-    padding: 24px;
+    padding: 8px;
     background: rgba(15, 10, 6, 0.78);
     z-index: 20;
   }
@@ -512,7 +512,7 @@
   .lightbox-image {
     display: block;
     width: 100%;
-    max-height: 92vh;
+    max-height: 98vh;
     object-fit: contain;
     background: transparent;
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.34);
@@ -631,7 +631,7 @@
     }
 
     .lightbox {
-      padding: 18px 10px;
+      padding: 4px;
     }
 
     .lightbox-spread {
@@ -684,9 +684,11 @@
 </div>
 
 <script>
+// Core runtime configuration for the edition date rules and remote image requests.
 const NZ_TIME_ZONE = "Pacific/Auckland";
 const SCALE = 70;
 const COVER_SCALE = 100;
+// Desktop shelf positions are hand-tuned against the background image.
 const SLOT_LAYOUTS = {
   3: [
     { left: "17.2%", width: "26.8%", rotate: "0deg", bottom: "19.8%", depth: 2 },
@@ -716,6 +718,7 @@ const EDITION_CONFIG = {
   ]
 };
 
+// DOM references are collected once because the app rewrites paper cards frequently.
 const els = {
   editionDate: document.getElementById("editionDate"),
   prevDay: document.getElementById("prevDay"),
@@ -735,6 +738,7 @@ const els = {
 let currentDate = formatNzDate(new Date());
 let currentEditions = [];
 let pageStateByEditionId = new Map();
+// Fullscreen reading mode keeps its own navigation model so the shelf can remain single-page.
 let lightboxEditionId = null;
 let lightboxPage = 1;
 let lightboxLoading = false;
@@ -752,6 +756,7 @@ function formatNzDate(date) {
 }
 
 function getNzWeekday(date) {
+  // Parse as UTC to avoid the viewer's local timezone shifting the intended NZ edition day.
   const [year, month, day] = String(date).split("-").map(Number);
   return new Date(Date.UTC(year, month - 1, day)).getUTCDay();
 }
@@ -779,6 +784,7 @@ function resolveEditionsForDate(date) {
 }
 
 function buildFrontPageUrl(edition, date, page) {
+  // The remote source expects a compact issue date and a fixed trailing identifier segment.
   const issueDate = String(date).replace(/-/g, "");
   const file = `${edition.id}${issueDate}00000000001001`;
   const scale = page === 1 ? COVER_SCALE : SCALE;
@@ -786,6 +792,7 @@ function buildFrontPageUrl(edition, date, page) {
 }
 
 function createPageState() {
+  // Each shelf card tracks its own loading lifecycle so cards can page independently.
   return {
     page: 1,
     lastSuccessfulPage: 1,
@@ -871,6 +878,7 @@ function buildPageAltText(edition, page) {
 }
 
 function normalizeLightboxPage(page) {
+  // Fullscreen mode treats page 1 as a standalone cover and subsequent navigation as even-numbered spreads.
   const normalized = Math.max(1, Number(page) || 1);
   if (normalized === 1) return 1;
   return normalized % 2 === 0 ? normalized : normalized - 1;
@@ -919,6 +927,7 @@ function loadLightboxSpread(editionId, targetPage) {
   const edition = getEditionById(editionId);
   if (!edition) return;
 
+  // Ignore stale async image completions by advancing a request id on every navigation action.
   const startPage = normalizeLightboxPage(targetPage);
   const requestId = lightboxRequestId + 1;
   lightboxRequestId = requestId;
@@ -949,6 +958,7 @@ function loadLightboxSpread(editionId, targetPage) {
   const rightUrl = buildFrontPageUrl(edition, currentDate, rightPage);
   const rightAlt = buildPageAltText(edition, rightPage);
 
+  // The right-hand page may be unavailable, so the spread gracefully falls back to a single loaded page.
   loadLightboxImage(leftUrl)
     .then(() => loadLightboxImage(rightUrl).then(() => true).catch(() => false))
     .then((hasRightPage) => {
@@ -967,6 +977,7 @@ function loadLightboxSpread(editionId, targetPage) {
 
 function changeLightboxPage(delta) {
   if (!lightboxEditionId || lightboxLoading) return;
+  // Spread navigation steps 1 -> 2-3 -> 4-5 and back again rather than moving one page at a time.
   const targetPage = delta < 0
     ? (lightboxPage <= 2 ? 1 : lightboxPage - 2)
     : (lightboxPage === 1 ? 2 : lightboxPage + 2);
@@ -1082,6 +1093,7 @@ function loadPaperPage(card, edition, date, state, targetPage) {
   state.page = targetPage;
   updatePaperControls(card, state);
   const url = buildFrontPageUrl(edition, date, targetPage);
+  // Request ids make rapid paging safe by preventing old image loads from winning the race.
   const requestId = state.requestId + 1;
   state.requestId = requestId;
 
@@ -1115,7 +1127,15 @@ function changePaperPage(editionId, delta) {
   loadPaperPage(card, edition, currentDate, state, targetPage);
 }
 
+function changeAllVisiblePaperPages(delta) {
+  // Main-view keyboard paging intentionally advances every visible edition together.
+  currentEditions.forEach((edition) => {
+    changePaperPage(edition.id, delta);
+  });
+}
+
 function renderShelf(date) {
+  // Changing the date rebuilds the shelf from scratch because the set of editions can change by weekday.
   clearPageTimers();
   currentDate = date;
   currentEditions = resolveEditionsForDate(date);
@@ -1168,6 +1188,7 @@ els.lightbox.addEventListener("click", (event) => {
   }
 });
 document.addEventListener("keydown", (event) => {
+  // Fullscreen shortcuts take precedence; otherwise the same arrows page every visible paper on the shelf.
   if (!els.lightbox.hidden && (event.key === "ArrowLeft" || event.key === "Left")) {
     event.preventDefault();
     changeLightboxPage(-1);
@@ -1176,6 +1197,16 @@ document.addEventListener("keydown", (event) => {
   if (!els.lightbox.hidden && (event.key === "ArrowRight" || event.key === "Right")) {
     event.preventDefault();
     changeLightboxPage(1);
+    return;
+  }
+  if (els.lightbox.hidden && (event.key === "ArrowLeft" || event.key === "Left")) {
+    event.preventDefault();
+    changeAllVisiblePaperPages(-1);
+    return;
+  }
+  if (els.lightbox.hidden && (event.key === "ArrowRight" || event.key === "Right")) {
+    event.preventDefault();
+    changeAllVisiblePaperPages(1);
     return;
   }
   if (event.key === "Escape" && !els.lightbox.hidden) {
