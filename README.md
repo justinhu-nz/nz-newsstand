@@ -18,6 +18,7 @@ Main interactions:
 
 - Choose a date with the date picker
 - Move day-by-day with `Prev Day`, `Today`, and `Next Day`
+- Use the settings icon to hide or restore front pages for the currently selected date lineup
 - Page through each visible paper independently
 - Use left/right keyboard arrows on the main shelf to move all visible papers together
 - Click a paper cover/page to open the fullscreen reader
@@ -31,10 +32,12 @@ The app uses a fixed mapping between day type and the editions shown:
   - `New Zealand Herald`
   - `The Post`
   - `The Press`
+  - `Otago Daily Times`
 - Saturdays:
   - `Weekend Herald`
   - `The Post`
   - `The Press`
+  - `Otago Daily Times`
 - Sundays:
   - `Herald on Sunday`
   - `Sunday Star-Times`
@@ -68,6 +71,8 @@ The `file` parameter is built from:
 - issue date in `YYYYMMDD`
 - a fixed trailing identifier segment used by the source system
 
+Edition ids can be numeric (for example `1126`) or alphanumeric (for example `9hym` for `Otago Daily Times`).
+
 The URL generation happens in `buildFrontPageUrl()`.
 
 ## Image Scaling Rules
@@ -76,6 +81,8 @@ The first page is treated as the cover and requests a higher scale:
 
 - Cover page: `scale=100`
 - Interior pages: `scale=70`
+
+`Otago Daily Times` uses the same cover scale but overrides interior pages to `scale=71`.
 
 This keeps the front page sharper while avoiding unnecessarily heavy requests for every subsequent page.
 
@@ -94,7 +101,7 @@ The top control bar contains:
 
 ### 2. Shelf Scene
 
-The main scene is a decorative background using `background-single.png` plus layered gradients and shadows. On desktop, papers are positioned into fixed "slots" on the shelf. On smaller screens, the layout switches to a horizontally scrollable row.
+The main scene is a decorative background using `background-single.png` plus layered gradients and shadows. On desktop, papers are positioned into fixed "slots" on the shelf. On smaller screens, the layout switches to a horizontally scrollable, snap-aligned row and the decorative shelf is hidden (see `Responsive / Mobile Behavior`).
 
 ### 3. Paper Cards
 
@@ -125,6 +132,38 @@ In fullscreen:
   - `6-7`
 
 This allows the shelf to stay simple while the reader behaves more like an opened newspaper.
+
+On phone-width screens the reader switches to a single-page model instead of facing-page spreads (see `Responsive / Mobile Behavior`).
+
+## Responsive / Mobile Behavior
+
+The layout has three breakpoints: `1080px`, `860px`, and `520px`, plus a dedicated reader breakpoint at `700px`. The phone experience (driven mainly by the `860px` and `700px` rules) differs from desktop in several deliberate ways.
+
+### Viewport And Device Fit
+
+- `viewport-fit=cover` is set so the page can extend under the notch / Dynamic Island and home indicator.
+- A `theme-color` (`#3a1b0b`) and `color-scheme: dark` keep the browser chrome consistent with the dark scene.
+- The app shell pads itself with `env(safe-area-inset-*)` so controls never sit under system UI.
+- Heights use dynamic viewport units (`100dvh`, with a `100vh` fallback) so the layout is stable when the mobile URL bar collapses.
+
+### Mobile Shelf
+
+- The app shell becomes a `dvh`-height flex column: the control bar takes its natural height and the scene grows to fill the rest.
+- The decorative shelf is removed on phones. `background-single.png`, the scene gradients (`::before` / `::after`), and the `.shelf-lip` are all hidden so papers read on the plain warm backdrop.
+- Papers render in a horizontally scrollable row that uses CSS scroll-snap (`scroll-snap-type: x mandatory`, `scroll-snap-align: center`, `scroll-snap-stop: always`). Symmetric `padding-inline` lets the first and last paper center, and adjacent papers "peek" at the edges.
+- The three day-navigation buttons share a single row (`flex: 1 1 0`) so the control bar stays two rows tall (date picker + buttons).
+
+### Mobile Reader
+
+- Below `700px` the reader shows one full-width page at a time instead of a two-page spread (two newspaper pages side-by-side are unreadable at phone widths). This is gated by `isMobileLightbox()`, which checks `matchMedia("(max-width: 700px)")`.
+- `normalizeLightboxPage()`, `loadLightboxSpread()`, and `changeLightboxPage()` all branch on `isMobileLightbox()`: on phones, paging steps one page at a time; on wider screens it keeps the `1 -> 2-3 -> 4-5` spread stepping.
+- A horizontal swipe pages the reader (touch handlers on the spread). Multi-touch gestures are ignored so pinch-to-zoom still works, and a swipe must be clearly horizontal to count.
+- Reader controls are enlarged for touch (close `44px`, nav `52px`) and the nav buttons move to thumb-reachable bottom corners, all offset by safe-area insets.
+
+### Touch Polish
+
+- The blue tap-highlight is removed and `touch-action: manipulation` is set on buttons and paper images.
+- `overscroll-behavior` is constrained to prevent page bounce / pull-to-refresh from interfering with shelf scrolling.
 
 ## Keyboard Shortcuts
 
@@ -164,7 +203,7 @@ Even though this is a single-file app, the JavaScript is organized into a few co
 - timezone constants
 - image scale constants
 - slot layout definitions
-- edition mappings
+- edition mappings, including optional per-edition scale overrides
 
 ### Date Utilities
 
@@ -184,6 +223,8 @@ Each edition has a small state object that tracks:
 - whether a request is currently in flight
 - a request id for race protection
 - an optional toast timer
+
+Separately, the app stores per-edition visibility preferences in local storage so hidden front pages stay hidden until re-enabled.
 
 ### Fullscreen State
 
@@ -237,9 +278,10 @@ Then open the served page in a browser.
 If you change this app in the future, the main areas to review together are:
 
 - `EDITION_CONFIG` if newspaper lineup changes
-- `buildFrontPageUrl()` if the remote source changes naming or query rules
+- `buildFrontPageUrl()` if the remote source changes naming, query rules, or edition-specific scale overrides
 - shelf and fullscreen keyboard handling if new interactions are added
 - fullscreen spread logic if reader behavior changes again
+- the `860px` / `700px` media queries and `isMobileLightbox()` together — the CSS breakpoint and the JS check share the `700px` value, so change them in step if the reader's mobile threshold moves
 
 ## Limitations
 

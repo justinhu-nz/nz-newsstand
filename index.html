@@ -7,6 +7,9 @@
 <meta name="color-scheme" content="dark">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="NZ Newsstand">
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
 <title>NZ Newsstand</title>
 <style>
   :root {
@@ -136,6 +139,8 @@
     width: min(660px, calc(100vw - 42px));
     margin: 0 auto 5px;
     backdrop-filter: blur(3px);
+    position: relative;
+    z-index: 5;
   }
 
   .ios6-btn,
@@ -219,6 +224,112 @@
     opacity: 0.95;
     cursor: pointer;
     filter: invert(1) brightness(1.15);
+  }
+
+  .settings-menu {
+    position: relative;
+    flex: 0 0 auto;
+  }
+
+  .settings-toggle {
+    min-width: 32px;
+    width: 32px;
+    padding: 0;
+    display: grid;
+    place-items: center;
+  }
+
+  .settings-icon {
+    width: 15px;
+    height: 15px;
+    opacity: 0.92;
+    pointer-events: none;
+  }
+
+  .settings-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: min(240px, calc(100vw - 26px));
+    padding: 10px 10px 8px;
+    border-radius: 13px;
+    border: 1px solid rgba(31, 44, 62, 0.96);
+    color: var(--chrome-text);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 26%, transparent 26%),
+      linear-gradient(180deg, rgba(58, 72, 95, 0.98) 0%, rgba(38, 50, 69, 0.98) 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.16),
+      0 14px 28px rgba(0, 0, 0, 0.28);
+    z-index: 12;
+  }
+
+  .settings-title {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgba(244, 247, 252, 0.9);
+  }
+
+  .settings-list {
+    display: grid;
+    gap: 6px;
+  }
+
+  .settings-item {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-height: 30px;
+    padding: 6px 8px;
+    width: 100%;
+    border: 0;
+    border-radius: 9px;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+    background: rgba(15, 23, 34, 0.18);
+  }
+
+  .settings-item:hover:not(:disabled) {
+    background: rgba(24, 34, 47, 0.28);
+  }
+
+  .settings-item:disabled {
+    cursor: default;
+  }
+
+  .settings-mark {
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(227, 235, 244, 0.72);
+    background: rgba(159, 184, 216, 0.95);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    flex: 0 0 auto;
+  }
+
+  .settings-item.is-off .settings-mark {
+    background: transparent;
+    opacity: 0.7;
+  }
+
+  .settings-item span:last-child {
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .settings-item.is-disabled span {
+    opacity: 0.72;
+  }
+
+  .settings-note {
+    margin: 8px 2px 0;
+    font-size: 10px;
+    color: rgba(235, 241, 248, 0.72);
   }
 
   .newsstand-scene {
@@ -518,13 +629,13 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 10px;
     align-items: start;
-    width: min(94vw, 1200px);
+    width: min(calc(100vw - 16px), 1200px);
     max-width: 100%;
   }
 
   .lightbox-spread.is-cover {
     grid-template-columns: minmax(0, 1fr);
-    width: min(92vw, 900px);
+    width: min(calc(100vw - 16px), 900px);
   }
 
   .lightbox-image {
@@ -578,6 +689,11 @@
       flex: 1 1 0;
       min-width: 0;
       padding: 0 8px;
+    }
+
+    .settings-menu {
+      flex: 0 0 auto;
+      margin-left: auto;
     }
 
     .newsstand-scene {
@@ -747,6 +863,21 @@
     </div>
     <button class="ios6-btn is-today" id="todayBtn" type="button">Today</button>
     <button class="ios6-btn" id="nextDay" type="button" aria-label="Next day">Next Day</button>
+    <div class="settings-menu" id="settingsMenu">
+      <button class="ios6-btn settings-toggle" id="settingsToggle" type="button" aria-label="Front page settings" aria-expanded="false" aria-controls="settingsPanel">
+        <svg class="settings-icon" viewBox="0 0 16 16" aria-hidden="true">
+          <path d="M2.2 4.2h4.4M10.1 4.2h3.7M2.2 8h7.1M12.6 8h1.2M2.2 11.8h2.9M8.6 11.8h5.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.6"/>
+          <circle cx="8.1" cy="4.2" r="1.6" fill="currentColor"/>
+          <circle cx="10.8" cy="8" r="1.6" fill="currentColor"/>
+          <circle cx="6.5" cy="11.8" r="1.6" fill="currentColor"/>
+        </svg>
+      </button>
+      <div class="settings-panel" id="settingsPanel" hidden>
+        <p class="settings-title">Front Pages</p>
+        <div class="settings-list" id="settingsList"></div>
+        <p class="settings-note">At least one visible front page stays on.</p>
+      </div>
+    </div>
   </header>
 
   <section class="newsstand-scene" id="scene" aria-live="polite">
@@ -772,6 +903,15 @@ const SCALE = 70;
 const COVER_SCALE = 100;
 // Desktop shelf positions are hand-tuned against the background image.
 const SLOT_LAYOUTS = {
+  4: [
+    { left: "14%", width: "21.2%", rotate: "0deg", bottom: "19.9%", depth: 2 },
+    { left: "38%", width: "21.2%", rotate: "0deg", bottom: "19.9%", depth: 3 },
+    { left: "62%", width: "21.2%", rotate: "0deg", bottom: "19.9%", depth: 3 },
+    { left: "86%", width: "21.2%", rotate: "0deg", bottom: "19.9%", depth: 2 }
+  ],
+  1: [
+    { left: "50%", width: "31.5%", rotate: "0deg", bottom: "20%", depth: 3 }
+  ],
   3: [
     { left: "17.2%", width: "26.8%", rotate: "0deg", bottom: "19.8%", depth: 2 },
     { left: "50%", width: "26.8%", rotate: "0deg", bottom: "19.8%", depth: 3 },
@@ -783,16 +923,20 @@ const SLOT_LAYOUTS = {
   ]
 };
 
+const EDITION_VISIBILITY_STORAGE_KEY = "nz-newsstand-visible-editions-v1";
+
 const EDITION_CONFIG = {
   weekday: [
     { id: "1126", title: "New Zealand Herald" },
     { id: "1022", title: "The Post" },
-    { id: "1272", title: "The Press" }
+    { id: "1272", title: "The Press" },
+    { id: "9hym", title: "Otago Daily Times", coverScale: 100, interiorScale: 71 }
   ],
   saturday: [
     { id: "7478", title: "Weekend Herald" },
     { id: "1022", title: "The Post" },
-    { id: "1272", title: "The Press" }
+    { id: "1272", title: "The Press" },
+    { id: "9hym", title: "Otago Daily Times", coverScale: 100, interiorScale: 71 }
   ],
   sunday: [
     { id: "1211", title: "Herald on Sunday" },
@@ -806,6 +950,10 @@ const els = {
   prevDay: document.getElementById("prevDay"),
   todayBtn: document.getElementById("todayBtn"),
   nextDay: document.getElementById("nextDay"),
+  settingsMenu: document.getElementById("settingsMenu"),
+  settingsToggle: document.getElementById("settingsToggle"),
+  settingsPanel: document.getElementById("settingsPanel"),
+  settingsList: document.getElementById("settingsList"),
   scene: document.getElementById("scene"),
   shelf: document.getElementById("shelf"),
   lightbox: document.getElementById("lightbox"),
@@ -819,12 +967,49 @@ const els = {
 
 let currentDate = formatNzDate(new Date());
 let currentEditions = [];
+let currentAvailableEditions = [];
 let pageStateByEditionId = new Map();
+let editionVisibilityById = loadEditionVisibility();
 // Fullscreen reading mode keeps its own navigation model so the shelf can remain single-page.
 let lightboxEditionId = null;
 let lightboxPage = 1;
 let lightboxLoading = false;
 let lightboxRequestId = 0;
+
+function loadEditionVisibility() {
+  try {
+    const raw = window.localStorage.getItem(EDITION_VISIBILITY_STORAGE_KEY);
+    if (!raw) return {};
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return {};
+    return Object.fromEntries(
+      Object.entries(parsed).filter(([, value]) => typeof value === "boolean")
+    );
+  } catch {
+    return {};
+  }
+}
+
+function saveEditionVisibility() {
+  try {
+    window.localStorage.setItem(EDITION_VISIBILITY_STORAGE_KEY, JSON.stringify(editionVisibilityById));
+  } catch {
+    // Ignore storage failures; the shelf still works for the current session.
+  }
+}
+
+function isEditionVisible(editionId) {
+  return editionVisibilityById[editionId] !== false;
+}
+
+function setEditionVisibility(editionId, visible) {
+  if (visible) {
+    delete editionVisibilityById[editionId];
+  } else {
+    editionVisibilityById[editionId] = false;
+  }
+  saveEditionVisibility();
+}
 
 function formatNzDate(date) {
   const parts = new Intl.DateTimeFormat("en-NZ", {
@@ -869,7 +1054,9 @@ function buildFrontPageUrl(edition, date, page) {
   // The remote source expects a compact issue date and a fixed trailing identifier segment.
   const issueDate = String(date).replace(/-/g, "");
   const file = `${edition.id}${issueDate}00000000001001`;
-  const scale = page === 1 ? COVER_SCALE : SCALE;
+  const scale = page === 1
+    ? (edition.coverScale ?? COVER_SCALE)
+    : (edition.interiorScale ?? SCALE);
   return `https://t.prcdn.co/img?file=${file}&page=${page}&scale=${scale}`;
 }
 
@@ -896,6 +1083,49 @@ function clearPageTimers() {
 
 function getSlots(count) {
   return SLOT_LAYOUTS[count] || SLOT_LAYOUTS[3];
+}
+
+function ensureVisibleEditions(editions) {
+  const visible = editions.filter((edition) => isEditionVisible(edition.id));
+  if (visible.length || !editions.length) return visible;
+  setEditionVisibility(editions[0].id, true);
+  return [editions[0]];
+}
+
+function setSettingsOpen(isOpen) {
+  els.settingsPanel.hidden = !isOpen;
+  els.settingsToggle.setAttribute("aria-expanded", String(isOpen));
+}
+
+function renderSettingsPanel() {
+  const editions = currentAvailableEditions.length ? currentAvailableEditions : resolveEditionsForDate(currentDate);
+  const visibleCount = editions.filter((edition) => isEditionVisible(edition.id)).length;
+  els.settingsList.innerHTML = "";
+
+  editions.forEach((edition) => {
+    const enabled = isEditionVisible(edition.id);
+    const item = document.createElement("button");
+    item.className = "settings-item";
+    item.type = "button";
+    item.disabled = enabled && visibleCount <= 1;
+    item.classList.toggle("is-disabled", item.disabled);
+    item.classList.toggle("is-off", !enabled);
+    item.setAttribute("aria-pressed", String(enabled));
+
+    item.addEventListener("click", () => {
+      setEditionVisibility(edition.id, !enabled);
+      renderSettingsPanel();
+      renderCurrentDate();
+    });
+
+    const mark = document.createElement("span");
+    mark.className = "settings-mark";
+    mark.setAttribute("aria-hidden", "true");
+    const label = document.createElement("span");
+    label.textContent = edition.title;
+    item.append(mark, label);
+    els.settingsList.appendChild(item);
+  });
 }
 
 function setPaperMessage(card, state, text, kind, persist) {
@@ -1029,7 +1259,7 @@ function loadLightboxSpread(editionId, targetPage) {
     loadLightboxImage(leftUrl)
       .then(() => {
         if (lightboxRequestId !== requestId) return;
-        lightboxPage = 1;
+        lightboxPage = startPage;
         lightboxLoading = false;
         setLightboxPages(leftUrl, leftAlt, "", "");
         updateLightboxControls();
@@ -1228,10 +1458,12 @@ function renderShelf(date) {
   // Changing the date rebuilds the shelf from scratch because the set of editions can change by weekday.
   clearPageTimers();
   currentDate = date;
-  currentEditions = resolveEditionsForDate(date);
+  currentAvailableEditions = resolveEditionsForDate(date);
+  currentEditions = ensureVisibleEditions(currentAvailableEditions);
   pageStateByEditionId = new Map(currentEditions.map((edition) => [edition.id, createPageState()]));
   els.scene.dataset.count = String(currentEditions.length);
   els.shelf.innerHTML = "";
+  renderSettingsPanel();
 
   const slots = getSlots(currentEditions.length);
   currentEditions.forEach((edition, index) => {
@@ -1265,6 +1497,16 @@ els.nextDay.addEventListener("click", () => {
   renderCurrentDate();
 });
 els.editionDate.addEventListener("change", renderCurrentDate);
+els.settingsToggle.addEventListener("click", (event) => {
+  event.stopPropagation();
+  if (els.settingsPanel.hidden) {
+    renderSettingsPanel();
+  }
+  setSettingsOpen(els.settingsPanel.hidden);
+});
+els.settingsMenu.addEventListener("click", (event) => {
+  event.stopPropagation();
+});
 els.lightboxPrev.addEventListener("click", () => {
   changeLightboxPage(-1);
 });
@@ -1302,6 +1544,10 @@ els.lightboxSpread.addEventListener("touchend", (event) => {
   changeLightboxPage(dx < 0 ? 1 : -1);
 }, { passive: true });
 document.addEventListener("keydown", (event) => {
+  if (!els.settingsPanel.hidden && event.key === "Escape") {
+    setSettingsOpen(false);
+    return;
+  }
   // Fullscreen shortcuts take precedence; otherwise the same arrows page every visible paper on the shelf.
   if (!els.lightbox.hidden && (event.key === "ArrowLeft" || event.key === "Left")) {
     event.preventDefault();
