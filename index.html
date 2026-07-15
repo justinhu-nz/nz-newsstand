@@ -843,6 +843,8 @@
     }
 
     .app-shell {
+      height: var(--mobile-viewport-height, 100dvh);
+      max-height: var(--mobile-viewport-height, 100dvh);
       padding-bottom: env(safe-area-inset-bottom);
     }
 
@@ -875,6 +877,7 @@
     .mobile-paper {
       position: relative;
       display: grid;
+      grid-template-rows: minmax(0, 1fr);
       place-items: center;
       width: 100%;
       height: 100%;
@@ -888,6 +891,10 @@
     .mobile-paper-image {
       width: 100%;
       height: 100%;
+      min-width: 0;
+      min-height: 0;
+      max-width: 100%;
+      max-height: 100%;
       object-fit: contain;
       opacity: 0;
       transition: opacity 160ms ease, transform 180ms ease;
@@ -1177,6 +1184,11 @@ let mobilePagePrefetchCache = new Map();
 
 function isMobileMode() {
   return window.matchMedia("(max-width: 700px), (max-height: 500px) and (pointer: coarse)").matches;
+}
+
+function syncMobileViewportHeight() {
+  const viewportHeight = window.visualViewport?.height || window.innerHeight;
+  document.documentElement.style.setProperty("--mobile-viewport-height", `${Math.round(viewportHeight)}px`);
 }
 
 function loadEditionVisibility() {
@@ -2032,10 +2044,24 @@ document.addEventListener("keydown", (event) => {
 
 const mobileModeQuery = window.matchMedia("(max-width: 700px), (max-height: 500px) and (pointer: coarse)");
 mobileModeQuery.addEventListener("change", () => {
+  syncMobileViewportHeight();
   closeLightbox();
   renderShelf(currentDate);
 });
 
+// iOS Safari's expanded bottom toolbar can cover part of 100dvh. The visual
+// viewport reports the genuinely visible height and changes as browser chrome
+// expands or collapses, so keep the mobile shell in sync with it.
+let mobileViewportFrame = 0;
+function scheduleMobileViewportSync() {
+  window.cancelAnimationFrame(mobileViewportFrame);
+  mobileViewportFrame = window.requestAnimationFrame(syncMobileViewportHeight);
+}
+window.addEventListener("resize", scheduleMobileViewportSync, { passive: true });
+window.visualViewport?.addEventListener("resize", scheduleMobileViewportSync, { passive: true });
+window.visualViewport?.addEventListener("scroll", scheduleMobileViewportSync, { passive: true });
+
+syncMobileViewportHeight();
 renderShelf(currentDate);
 </script>
 </body>

@@ -146,7 +146,7 @@ The layout has three general breakpoints at `1080px`, `860px`, and `520px`, plus
 - `viewport-fit=cover` is set so the page can extend under the notch / Dynamic Island and home indicator.
 - A `theme-color` (`#3a1b0b`) and `color-scheme: dark` keep the browser chrome consistent with the dark scene.
 - The app shell pads itself with `env(safe-area-inset-*)` so controls never sit under system UI.
-- Heights use dynamic viewport units (`100dvh`, with a `100vh` fallback) so the layout is stable when the mobile URL bar collapses.
+- Mobile height is synchronized to `window.visualViewport.height` (with `100dvh` as the CSS fallback) so expanded iOS Safari controls cannot cover the bottom of the newspaper or its page controls.
 
 ### Two-Axis Mobile Reader
 
