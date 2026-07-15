@@ -86,6 +86,8 @@ The first page is treated as the cover and requests a higher scale:
 
 This keeps the front page sharper while avoiding unnecessarily heavy requests for every subsequent page.
 
+If an interior page fails at its configured scale, the app retries that page three times, reducing the scale by 10 for each attempt, before reporting it as unavailable. For example, a configured scale of `70` tries `70`, `60`, `50`, then `40`. Cover pages continue to use a single high-quality request.
+
 ## UI Structure
 
 The page can be understood in three layers.
@@ -101,7 +103,7 @@ The top control bar contains:
 
 ### 2. Shelf Scene
 
-The main scene is a decorative background using `background-single.png` plus layered gradients and shadows. On desktop, papers are positioned into fixed "slots" on the shelf. On smaller screens, the layout switches to a horizontally scrollable, snap-aligned row and the decorative shelf is hidden (see `Responsive / Mobile Behavior`).
+The main scene is a decorative background using `background-single.png` plus layered gradients and shadows. On desktop, papers are positioned into fixed "slots" on the shelf. Phones use a separate two-axis reader instead of the shelf (see `Responsive / Mobile Behavior`).
 
 ### 3. Paper Cards
 
@@ -133,11 +135,11 @@ In fullscreen:
 
 This allows the shelf to stay simple while the reader behaves more like an opened newspaper.
 
-On phone-width screens the reader switches to a single-page model instead of facing-page spreads (see `Responsive / Mobile Behavior`).
+The fullscreen reader remains a desktop interaction. Phones use the dedicated single-page mobile reader described below.
 
 ## Responsive / Mobile Behavior
 
-The layout has three breakpoints: `1080px`, `860px`, and `520px`, plus a dedicated reader breakpoint at `700px`. The phone experience (driven mainly by the `860px` and `700px` rules) differs from desktop in several deliberate ways.
+The layout has three general breakpoints at `1080px`, `860px`, and `520px`, plus a dedicated mobile-mode boundary at `700px`. Coarse-pointer devices also keep mobile mode in short landscape viewports. The desktop shelf and fullscreen spread behavior remain separate and unchanged.
 
 ### Viewport And Device Fit
 
@@ -146,19 +148,18 @@ The layout has three breakpoints: `1080px`, `860px`, and `520px`, plus a dedicat
 - The app shell pads itself with `env(safe-area-inset-*)` so controls never sit under system UI.
 - Heights use dynamic viewport units (`100dvh`, with a `100vh` fallback) so the layout is stable when the mobile URL bar collapses.
 
-### Mobile Shelf
+### Two-Axis Mobile Reader
 
 - The app shell becomes a `dvh`-height flex column: the control bar takes its natural height and the scene grows to fill the rest.
-- The decorative shelf is removed on phones. `background-single.png`, the scene gradients (`::before` / `::after`), and the `.shelf-lip` are all hidden so papers read on the plain warm backdrop.
-- Papers render in a horizontally scrollable row that uses CSS scroll-snap (`scroll-snap-type: x mandatory`, `scroll-snap-align: center`, `scroll-snap-stop: always`). Symmetric `padding-inline` lets the first and last paper center, and adjacent papers "peek" at the edges.
+- The desktop shelf is hidden and replaced by a dedicated full-height mobile surface.
+- A horizontal swipe moves one page backward or forward within the current newspaper.
+- A vertical swipe moves between newspapers. Every newspaper occupies one mandatory vertical scroll-snap stop.
+- Page position is stored independently for each newspaper, so returning vertically to a paper restores the page that was being read.
+- After a page loads, the next page for that newspaper is prefetched into a mobile-only request cache so the following horizontal navigation can reuse an in-flight or completed load.
+- Clearly horizontal gestures are required before paging; vertical and diagonal motion stays with the native vertical scroller, and multi-touch gestures are ignored.
+- Each paper includes visible previous/next page buttons so gestures are not the only navigation method.
+- Loading, unavailable-page, newspaper-position, and current-page states appear directly over the active paper.
 - The three day-navigation buttons share a single row (`flex: 1 1 0`) so the control bar stays two rows tall (date picker + buttons).
-
-### Mobile Reader
-
-- Below `700px` the reader shows one full-width page at a time instead of a two-page spread (two newspaper pages side-by-side are unreadable at phone widths). This is gated by `isMobileLightbox()`, which checks `matchMedia("(max-width: 700px)")`.
-- `normalizeLightboxPage()`, `loadLightboxSpread()`, and `changeLightboxPage()` all branch on `isMobileLightbox()`: on phones, paging steps one page at a time; on wider screens it keeps the `1 -> 2-3 -> 4-5` spread stepping.
-- A horizontal swipe pages the reader (touch handlers on the spread). Multi-touch gestures are ignored so pinch-to-zoom still works, and a swipe must be clearly horizontal to count.
-- Reader controls are enlarged for touch (close `44px`, nav `52px`) and the nav buttons move to thumb-reachable bottom corners, all offset by safe-area insets.
 
 ### Touch Polish
 
@@ -192,6 +193,7 @@ Examples:
 
 - If page 1 fails to load, the card shows `Issue unavailable`
 - If a later page fails to load, the card keeps the last successful page and shows a transient message such as `Page X unavailable`
+- An unavailable page does not block navigation: the page cursor advances past it, so the next action tries the following page instead of repeatedly retrying the missing one
 - Fullscreen spread loading is tolerant of missing right-hand pages, so a spread can degrade to a single loaded left page if necessary
 
 ## Internal Architecture
@@ -245,6 +247,7 @@ This pattern is used for:
 
 - shelf page loading
 - fullscreen spread loading
+- mobile page loading
 
 ## File Overview
 
@@ -281,7 +284,7 @@ If you change this app in the future, the main areas to review together are:
 - `buildFrontPageUrl()` if the remote source changes naming, query rules, or edition-specific scale overrides
 - shelf and fullscreen keyboard handling if new interactions are added
 - fullscreen spread logic if reader behavior changes again
-- the `860px` / `700px` media queries and `isMobileLightbox()` together — the CSS breakpoint and the JS check share the `700px` value, so change them in step if the reader's mobile threshold moves
+- the phone media query and `isMobileMode()` together — CSS and JavaScript share the mobile-mode boundary and should change in step
 
 ## Limitations
 

@@ -15,21 +15,21 @@
   :root {
     --bg-top: #4a250f;
     --bg-bottom: #1d0f09;
-    --chrome-top: #7485a0;
-    --chrome-mid: #51637e;
-    --chrome-bottom: #344764;
-    --chrome-line: rgba(12, 20, 31, 0.88);
-    --chrome-text: #f6f8fb;
-    --chrome-shadow: rgba(8, 12, 18, 0.6);
-    --button-top: #93b0d1;
-    --button-mid: #6f90b8;
-    --button-bottom: #496a95;
-    --button-edge: #29415f;
+    --chrome-top: #806652;
+    --chrome-mid: #624735;
+    --chrome-bottom: #402d22;
+    --chrome-line: rgba(48, 31, 21, 0.92);
+    --chrome-text: #fff8ee;
+    --chrome-shadow: rgba(28, 19, 14, 0.62);
+    --button-top: #aa805d;
+    --button-mid: #82583a;
+    --button-bottom: #563621;
+    --button-edge: #422817;
     --button-highlight: rgba(255, 255, 255, 0.5);
-    --button-pressed-top: #5576a0;
-    --button-pressed-bottom: #3d5d86;
-    --button-disabled-top: #7b8595;
-    --button-disabled-bottom: #5d6676;
+    --button-pressed-top: #7c4d30;
+    --button-pressed-bottom: #4f301d;
+    --button-disabled-top: #887366;
+    --button-disabled-bottom: #665044;
     --cover-border: rgba(70, 52, 36, 0.55);
     --cover-shadow: rgba(31, 13, 3, 0.52);
     --cover-sheen: rgba(255, 255, 255, 0.36);
@@ -46,7 +46,8 @@
   html,
   body {
     margin: 0;
-    min-height: 100%;
+    width: 100%;
+    height: 100%;
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
   }
@@ -114,10 +115,15 @@
 
   .app-shell {
     width: 100%;
+    height: 100vh;
+    height: 100dvh;
     margin: 0 auto;
     padding: 6px 0 8px;
     position: relative;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
 
   .control-bar {
@@ -131,7 +137,7 @@
     border-radius: 15px;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.07) 0%, transparent 24%),
-      linear-gradient(180deg, rgba(89, 105, 131, 0.84) 0%, rgba(61, 76, 100, 0.82) 56%, rgba(45, 58, 79, 0.86) 100%);
+      linear-gradient(180deg, rgba(128, 102, 82, 0.94) 0%, rgba(98, 71, 53, 0.92) 56%, rgba(64, 45, 34, 0.96) 100%);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.16),
       inset 0 -1px 0 rgba(12, 20, 31, 0.16),
@@ -141,6 +147,7 @@
     backdrop-filter: blur(3px);
     position: relative;
     z-index: 5;
+    flex: 0 0 auto;
   }
 
   .ios6-btn,
@@ -165,7 +172,7 @@
     border-radius: 10px;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.04) 42%, transparent 42%),
-      linear-gradient(180deg, rgba(126, 154, 191, 0.88) 0%, rgba(91, 117, 151, 0.88) 54%, rgba(66, 90, 121, 0.92) 100%);
+      linear-gradient(180deg, rgba(170, 128, 93, 0.96) 0%, rgba(130, 88, 58, 0.96) 54%, rgba(86, 54, 33, 0.99) 100%);
     cursor: pointer;
   }
 
@@ -177,7 +184,7 @@
     transform: translateY(1px);
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 42%, transparent 42%),
-      linear-gradient(180deg, rgba(90, 116, 150, 0.94) 0%, rgba(62, 85, 116, 0.96) 100%);
+      linear-gradient(180deg, var(--button-pressed-top) 0%, var(--button-pressed-bottom) 100%);
     box-shadow:
       inset 0 2px 4px rgba(12, 20, 31, 0.28),
       0 1px 0 rgba(12, 20, 31, 0.2);
@@ -204,7 +211,7 @@
     padding: 0 8px;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 36%, transparent 36%),
-      linear-gradient(180deg, rgba(56, 70, 93, 0.92) 0%, rgba(43, 56, 76, 0.94) 100%);
+      linear-gradient(180deg, rgba(96, 65, 45, 0.97) 0%, rgba(62, 40, 27, 0.99) 100%);
   }
 
   .date-shell input[type="date"] {
@@ -253,11 +260,11 @@
     width: min(240px, calc(100vw - 26px));
     padding: 10px 10px 8px;
     border-radius: 13px;
-    border: 1px solid rgba(31, 44, 62, 0.96);
+    border: 1px solid rgba(58, 42, 32, 0.96);
     color: var(--chrome-text);
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 26%, transparent 26%),
-      linear-gradient(180deg, rgba(58, 72, 95, 0.98) 0%, rgba(38, 50, 69, 0.98) 100%);
+      linear-gradient(180deg, rgba(99, 70, 49, 0.98) 0%, rgba(58, 39, 27, 0.99) 100%);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.16),
       0 14px 28px rgba(0, 0, 0, 0.28);
@@ -290,11 +297,11 @@
     color: inherit;
     text-align: left;
     cursor: pointer;
-    background: rgba(15, 23, 34, 0.18);
+    background: rgba(34, 23, 17, 0.24);
   }
 
   .settings-item:hover:not(:disabled) {
-    background: rgba(24, 34, 47, 0.28);
+    background: rgba(52, 35, 26, 0.4);
   }
 
   .settings-item:disabled {
@@ -306,7 +313,7 @@
     height: 14px;
     border-radius: 999px;
     border: 1px solid rgba(227, 235, 244, 0.72);
-    background: rgba(159, 184, 216, 0.95);
+    background: rgba(210, 157, 101, 0.96);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
     flex: 0 0 auto;
   }
@@ -334,21 +341,24 @@
 
   .newsstand-scene {
     position: relative;
-    aspect-ratio: 1672 / 941;
-    width: min(100vw, calc((100vh - 82px) * 1672 / 941));
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100vw;
+    max-width: 100%;
     height: auto;
     margin: 0 auto;
     border-radius: 0;
     overflow: hidden;
     background:
       linear-gradient(180deg, rgba(33, 16, 7, 0.18), rgba(33, 16, 7, 0.05)),
-      url("./background-single.png") center center / cover no-repeat;
+      url("./background-single.png") center center / 100% 100% no-repeat;
     box-shadow:
       0 0 0 1px rgba(103, 62, 28, 0.22),
       inset 0 1px 0 rgba(255, 255, 255, 0.12),
       inset 0 22px 36px rgba(57, 25, 7, 0.14),
       0 24px 46px rgba(0, 0, 0, 0.32),
       0 0 90px rgba(124, 74, 28, 0.18);
+    container-type: size;
   }
 
   .newsstand-scene::before {
@@ -380,27 +390,11 @@
     z-index: 2;
   }
 
-  .shelf-lip {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 80.1%;
-    height: 5.35%;
-    z-index: 4;
-    pointer-events: none;
-    background:
-      linear-gradient(180deg, rgba(255, 248, 222, 0.28) 0%, rgba(255, 248, 222, 0.06) 7%, transparent 7%),
-      linear-gradient(180deg, #e1a95d 0%, #cf934e 18%, #b87a38 100%);
-    box-shadow:
-      inset 0 1px 0 rgba(255, 245, 218, 0.62),
-      inset 0 -8px 18px rgba(105, 57, 17, 0.2);
-  }
-
   .paper-card {
     position: absolute;
     left: var(--slot-left);
     bottom: var(--slot-bottom);
-    width: var(--paper-width);
+    width: min(var(--paper-width), calc(60cqh * 5 / 7));
     transform: translateX(-50%);
   }
 
@@ -413,12 +407,28 @@
 
   .paper-shadow {
     position: absolute;
-    inset: auto 6% -6px 6%;
-    height: 18px;
+    inset: auto -3% -13px -2%;
+    height: 31px;
     border-radius: 50%;
-    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0));
-    filter: blur(6px);
+    background:
+      radial-gradient(ellipse at 48% 16%, rgba(41, 20, 7, 0.38) 0%, rgba(41, 20, 7, 0.25) 30%, rgba(41, 20, 7, 0.12) 52%, rgba(41, 20, 7, 0.04) 68%, rgba(41, 20, 7, 0) 84%);
+    filter: blur(7px);
+    transform: translateX(5px) scaleX(0.99);
+    opacity: 0.76;
     z-index: 0;
+    pointer-events: none;
+  }
+
+  .paper-shadow::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 1%;
+    right: 3%;
+    height: 5px;
+    border-radius: 50%;
+    background: rgba(31, 14, 4, 0.4);
+    filter: blur(1.8px);
   }
 
   .paper-cover {
@@ -430,8 +440,12 @@
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(251, 249, 243, 0.98));
     box-shadow:
-      0 16px 24px var(--cover-shadow),
+      1px 2px 3px rgba(42, 21, 8, 0.26),
+      4px 9px 15px rgba(42, 21, 8, 0.19),
+      10px 22px 36px rgba(42, 21, 8, 0.13),
+      0 3px 3px rgba(35, 16, 5, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.78);
+    z-index: 1;
   }
 
   .paper-cover::after {
@@ -543,7 +557,7 @@
     justify-content: center;
     padding: 0 10px;
     border-radius: 11px;
-    border: 1px solid rgba(39, 50, 69, 0.92);
+    border: 1px solid rgba(65, 45, 34, 0.94);
     color: #eff4fb;
     font-size: 12px;
     font-weight: 700;
@@ -551,7 +565,7 @@
     text-shadow: 0 -1px 0 rgba(10, 18, 26, 0.7);
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.03) 44%, transparent 44%),
-      linear-gradient(180deg, #465874 0%, #34465f 100%);
+      linear-gradient(180deg, #80573a 0%, #513420 100%);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.24),
       0 2px 0 rgba(12, 20, 31, 0.22);
@@ -647,9 +661,37 @@
     box-shadow: 0 20px 44px rgba(0, 0, 0, 0.34);
   }
 
+  .lightbox-status {
+    position: absolute;
+    left: 50%;
+    bottom: 22px;
+    transform: translateX(-50%);
+    max-width: calc(100vw - 140px);
+    padding: 8px 12px;
+    border-radius: 10px;
+    color: #fff;
+    background: rgba(15, 10, 6, 0.78);
+    font-size: 14px;
+    text-align: center;
+    z-index: 2;
+  }
+
+  /* The phone reader is a separate interaction surface. It stays out of the
+     desktop layout entirely and is enabled only by the final phone breakpoint. */
+  .mobile-reader {
+    display: none;
+  }
+
+  .paper-image[role="button"]:focus-visible,
+  button:focus-visible,
+  input:focus-visible {
+    outline: 3px solid #ffd36a;
+    outline-offset: 3px;
+  }
+
   @media (max-width: 1080px) {
     .app-shell {
-      width: min(100vw - 18px, 1440px);
+      width: 100%;
       padding-top: 8px;
     }
 
@@ -664,10 +706,8 @@
 
   @media (max-width: 860px) {
     .app-shell {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      min-height: 100dvh;
+      height: 100vh;
+      height: 100dvh;
       padding-top: calc(8px + env(safe-area-inset-top));
       padding-bottom: calc(10px + env(safe-area-inset-bottom));
       padding-left: env(safe-area-inset-left);
@@ -702,7 +742,7 @@
       width: 100%;
       max-width: none;
       flex: 1 1 auto;
-      min-height: 440px;
+      min-height: 0;
       background: none;
       box-shadow: none;
       overflow: visible;
@@ -710,8 +750,7 @@
 
     /* Drop the decorative shelf on phones — papers read better on the plain backdrop. */
     .newsstand-scene::before,
-    .newsstand-scene::after,
-    .shelf-lip {
+    .newsstand-scene::after {
       display: none;
     }
 
@@ -723,7 +762,7 @@
       justify-content: flex-start;
       gap: 14px;
       padding: 8px 0;
-      padding-inline: calc((100% - min(82vw, 360px, 60dvh)) / 2);
+      padding-inline: calc((100% - min(94vw, 420px, calc((100cqh - 132px) * 5 / 7))) / 2);
       overflow-x: auto;
       overflow-y: hidden;
       scrollbar-width: none;
@@ -741,8 +780,8 @@
       position: relative;
       left: auto;
       bottom: auto;
-      width: min(82vw, 360px, 60dvh);
-      min-width: min(82vw, 360px, 60dvh);
+      width: min(94vw, 420px, calc((100cqh - 132px) * 5 / 7));
+      min-width: min(94vw, 420px, calc((100cqh - 132px) * 5 / 7));
       transform: none;
       flex: 0 0 auto;
       scroll-snap-align: center;
@@ -798,7 +837,157 @@
   }
 
   /* Phone reader: one full-width page at a time, thumb-reachable controls. */
-  @media (max-width: 700px) {
+  @media (max-width: 700px), (max-height: 500px) and (pointer: coarse) {
+    body {
+      overscroll-behavior: none;
+    }
+
+    .app-shell {
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+
+    .newsstand-scene {
+      display: none;
+    }
+
+    .mobile-reader {
+      position: relative;
+      display: block;
+      flex: 1 1 auto;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      scroll-behavior: smooth;
+      overscroll-behavior-y: contain;
+      scrollbar-width: none;
+      touch-action: pan-y pinch-zoom;
+      background:
+        radial-gradient(circle at 50% 22%, rgba(226, 164, 101, 0.13), transparent 34%),
+        linear-gradient(180deg, #3d1d0d 0%, #211009 100%);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .mobile-reader::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mobile-paper {
+      position: relative;
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      min-height: 100%;
+      padding: 48px 10px 64px;
+      overflow: hidden;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+    }
+
+    .mobile-paper-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: 0;
+      transition: opacity 160ms ease, transform 180ms ease;
+      filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.3));
+      user-select: none;
+      -webkit-user-drag: none;
+    }
+
+    .mobile-paper-image.is-visible {
+      opacity: 1;
+    }
+
+    .mobile-paper.is-changing .mobile-paper-image {
+      transform: scale(0.985);
+    }
+
+    .mobile-paper-topline,
+    .mobile-paper-controls,
+    .mobile-paper-status {
+      position: absolute;
+      z-index: 2;
+      color: #fffaf3;
+      background: rgba(31, 17, 10, 0.78);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .mobile-paper-topline {
+      top: 8px;
+      left: 10px;
+      right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-height: 34px;
+      padding: 7px 11px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .mobile-paper-position {
+      flex: 0 0 auto;
+      color: rgba(255, 250, 243, 0.72);
+    }
+
+    .mobile-paper-controls {
+      left: 50%;
+      bottom: 8px;
+      transform: translateX(-50%);
+      display: grid;
+      grid-template-columns: 46px minmax(92px, auto) 46px;
+      align-items: center;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 999px;
+    }
+
+    .mobile-page-button {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border: 0;
+      border-radius: 999px;
+      color: #fff;
+      background: rgba(255, 255, 255, 0.12);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .mobile-page-button:disabled {
+      opacity: 0.35;
+    }
+
+    .mobile-page-label {
+      text-align: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .mobile-paper-status {
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      max-width: calc(100% - 48px);
+      padding: 9px 13px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .mobile-paper-status.is-error {
+      background: rgba(116, 29, 20, 0.9);
+    }
+
     .lightbox {
       padding: 0;
     }
@@ -882,8 +1071,8 @@
 
   <section class="newsstand-scene" id="scene" aria-live="polite">
     <div class="shelf-papers" id="shelf"></div>
-    <div class="shelf-lip" aria-hidden="true"></div>
   </section>
+  <section class="mobile-reader" id="mobileReader" aria-label="Mobile newspaper reader" aria-live="polite"></section>
 </main>
 
 <div class="lightbox" id="lightbox" hidden>
@@ -894,6 +1083,7 @@
     <img class="lightbox-image" id="lightboxImageLeft" alt="">
     <img class="lightbox-image" id="lightboxImageRight" alt="" hidden>
   </div>
+  <div class="lightbox-status" id="lightboxStatus" role="status" aria-live="polite" hidden></div>
 </div>
 
 <script>
@@ -904,10 +1094,10 @@ const COVER_SCALE = 100;
 // Desktop shelf positions are hand-tuned against the background image.
 const SLOT_LAYOUTS = {
   4: [
-    { left: "14%", width: "21.2%", rotate: "0deg", bottom: "19.9%", depth: 2 },
-    { left: "38%", width: "21.2%", rotate: "0deg", bottom: "19.9%", depth: 3 },
-    { left: "62%", width: "21.2%", rotate: "0deg", bottom: "19.9%", depth: 3 },
-    { left: "86%", width: "21.2%", rotate: "0deg", bottom: "19.9%", depth: 2 }
+    { left: "13%", width: "24%", rotate: "0deg", bottom: "19.9%", depth: 2 },
+    { left: "37.67%", width: "24%", rotate: "0deg", bottom: "19.9%", depth: 3 },
+    { left: "62.33%", width: "24%", rotate: "0deg", bottom: "19.9%", depth: 3 },
+    { left: "87%", width: "24%", rotate: "0deg", bottom: "19.9%", depth: 2 }
   ],
   1: [
     { left: "50%", width: "31.5%", rotate: "0deg", bottom: "20%", depth: 3 }
@@ -956,11 +1146,13 @@ const els = {
   settingsList: document.getElementById("settingsList"),
   scene: document.getElementById("scene"),
   shelf: document.getElementById("shelf"),
+  mobileReader: document.getElementById("mobileReader"),
   lightbox: document.getElementById("lightbox"),
   lightboxPrev: document.getElementById("lightboxPrev"),
   lightboxNext: document.getElementById("lightboxNext"),
   lightboxClose: document.getElementById("lightboxClose"),
   lightboxSpread: document.getElementById("lightboxSpread"),
+  lightboxStatus: document.getElementById("lightboxStatus"),
   lightboxImageLeft: document.getElementById("lightboxImageLeft"),
   lightboxImageRight: document.getElementById("lightboxImageRight")
 };
@@ -975,6 +1167,17 @@ let lightboxEditionId = null;
 let lightboxPage = 1;
 let lightboxLoading = false;
 let lightboxRequestId = 0;
+let lightboxReturnFocus = null;
+// Phone navigation is intentionally independent from the desktop shelf/lightbox state.
+let mobilePageStateByEditionId = new Map();
+let mobileActiveEditionIndex = 0;
+let mobileReaderObserver = null;
+let mobileRenderId = 0;
+let mobilePagePrefetchCache = new Map();
+
+function isMobileMode() {
+  return window.matchMedia("(max-width: 700px), (max-height: 500px) and (pointer: coarse)").matches;
+}
 
 function loadEditionVisibility() {
   try {
@@ -1050,14 +1253,26 @@ function resolveEditionsForDate(date) {
   return EDITION_CONFIG.weekday;
 }
 
-function buildFrontPageUrl(edition, date, page) {
+function getPageScale(edition, page) {
+  return page === 1
+    ? (edition.coverScale ?? COVER_SCALE)
+    : (edition.interiorScale ?? SCALE);
+}
+
+function buildFrontPageUrl(edition, date, page, scale = getPageScale(edition, page)) {
   // The remote source expects a compact issue date and a fixed trailing identifier segment.
   const issueDate = String(date).replace(/-/g, "");
   const file = `${edition.id}${issueDate}00000000001001`;
-  const scale = page === 1
-    ? (edition.coverScale ?? COVER_SCALE)
-    : (edition.interiorScale ?? SCALE);
   return `https://t.prcdn.co/img?file=${file}&page=${page}&scale=${scale}`;
+}
+
+function buildPageUrlCandidates(edition, date, page) {
+  const initialScale = getPageScale(edition, page);
+  const scales = page === 1
+    ? [initialScale]
+    : [initialScale, initialScale - 10, initialScale - 20, initialScale - 30];
+  return [...new Set(scales.filter((scale) => scale > 0))]
+    .map((scale) => buildFrontPageUrl(edition, date, page, scale));
 }
 
 function createPageState() {
@@ -1161,7 +1376,8 @@ function updatePaperControls(card, state) {
   const prevButton = card.querySelector('[data-action="prev"]');
   const nextButton = card.querySelector('[data-action="next"]');
   const indicator = card.querySelector(".page-indicator");
-  indicator.textContent = `Page ${state.page}`;
+  const showingUnavailablePage = state.hasLoaded && !state.loading && state.page !== state.lastSuccessfulPage;
+  indicator.textContent = showingUnavailablePage ? `Page ${state.page} unavailable` : `Page ${state.page}`;
   prevButton.disabled = state.loading || state.page <= 1;
   nextButton.disabled = state.loading;
   card.classList.toggle("is-loading", state.loading);
@@ -1213,6 +1429,11 @@ function clearLightboxPages() {
   els.lightboxImageRight.alt = "";
 }
 
+function setLightboxStatus(message) {
+  els.lightboxStatus.textContent = message;
+  els.lightboxStatus.hidden = !message;
+}
+
 function setLightboxPages(leftSrc, leftAlt, rightSrc, rightAlt) {
   const hasRightPage = Boolean(rightSrc);
   els.lightboxSpread.classList.toggle("is-cover", !hasRightPage);
@@ -1241,6 +1462,18 @@ function loadLightboxImage(url) {
   });
 }
 
+async function loadPageImageWithFallback(edition, date, page) {
+  const candidates = buildPageUrlCandidates(edition, date, page);
+  for (const url of candidates) {
+    try {
+      return await loadLightboxImage(url);
+    } catch {
+      // Interior pages retry three times in ten-point scale reductions before failing.
+    }
+  }
+  throw new Error(`Page ${page} unavailable at all attempted scales`);
+}
+
 function loadLightboxSpread(editionId, targetPage) {
   const edition = getEditionById(editionId);
   if (!edition) return;
@@ -1250,45 +1483,53 @@ function loadLightboxSpread(editionId, targetPage) {
   const requestId = lightboxRequestId + 1;
   lightboxRequestId = requestId;
   lightboxLoading = true;
+  setLightboxStatus(`Loading page ${startPage}`);
   updateLightboxControls();
 
-  const leftUrl = buildFrontPageUrl(edition, currentDate, startPage);
   const leftAlt = buildPageAltText(edition, startPage);
 
   if (startPage === 1 || isMobileLightbox()) {
-    loadLightboxImage(leftUrl)
-      .then(() => {
+    loadPageImageWithFallback(edition, currentDate, startPage)
+      .then((leftUrl) => {
         if (lightboxRequestId !== requestId) return;
         lightboxPage = startPage;
         lightboxLoading = false;
         setLightboxPages(leftUrl, leftAlt, "", "");
+        setLightboxStatus("");
         updateLightboxControls();
       })
       .catch(() => {
         if (lightboxRequestId !== requestId) return;
+        lightboxPage = startPage;
         lightboxLoading = false;
+        setLightboxStatus(`Page ${startPage} unavailable`);
         updateLightboxControls();
       });
     return;
   }
 
   const rightPage = startPage + 1;
-  const rightUrl = buildFrontPageUrl(edition, currentDate, rightPage);
   const rightAlt = buildPageAltText(edition, rightPage);
 
   // The right-hand page may be unavailable, so the spread gracefully falls back to a single loaded page.
-  loadLightboxImage(leftUrl)
-    .then(() => loadLightboxImage(rightUrl).then(() => true).catch(() => false))
-    .then((hasRightPage) => {
+  loadPageImageWithFallback(edition, currentDate, startPage)
+    .then((leftUrl) => Promise.all([
+      Promise.resolve(leftUrl),
+      loadPageImageWithFallback(edition, currentDate, rightPage).catch(() => "")
+    ]))
+    .then(([leftUrl, rightUrl]) => {
       if (lightboxRequestId !== requestId) return;
       lightboxPage = startPage;
       lightboxLoading = false;
-      setLightboxPages(leftUrl, leftAlt, hasRightPage ? rightUrl : "", hasRightPage ? rightAlt : "");
+      setLightboxPages(leftUrl, leftAlt, rightUrl, rightUrl ? rightAlt : "");
+      setLightboxStatus(rightUrl ? "" : `Page ${rightPage} unavailable`);
       updateLightboxControls();
     })
     .catch(() => {
       if (lightboxRequestId !== requestId) return;
+      lightboxPage = startPage;
       lightboxLoading = false;
+      setLightboxStatus(`Page ${startPage} unavailable`);
       updateLightboxControls();
     });
 }
@@ -1312,11 +1553,13 @@ function openLightbox(editionId, src, alt) {
   lightboxEditionId = editionId;
   lightboxPage = startPage;
   lightboxLoading = false;
+  lightboxReturnFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   els.lightbox.hidden = false;
   document.body.style.overflow = "hidden";
 
   if (startPage === 1 && src) {
     setLightboxPages(src, alt || "", "", "");
+    setLightboxStatus("");
   } else {
     clearLightboxPages();
     loadLightboxSpread(editionId, startPage);
@@ -1327,14 +1570,19 @@ function openLightbox(editionId, src, alt) {
 }
 
 function closeLightbox() {
+  if (els.lightbox.hidden) return;
+  const returnFocus = lightboxReturnFocus;
   lightboxEditionId = null;
   lightboxPage = 1;
   lightboxLoading = false;
   lightboxRequestId += 1;
   els.lightbox.hidden = true;
   clearLightboxPages();
+  setLightboxStatus("");
   document.body.style.overflow = "";
   updateLightboxControls();
+  lightboxReturnFocus = null;
+  if (returnFocus && returnFocus.isConnected) returnFocus.focus();
 }
 
 function createPaperCard(edition, slot) {
@@ -1350,7 +1598,7 @@ function createPaperCard(edition, slot) {
     <div class="paper-cover-wrap">
       <div class="paper-shadow"></div>
       <div class="paper-cover">
-        <img class="paper-image" alt="${edition.title}">
+        <img class="paper-image" alt="${edition.title}" role="button" tabindex="0" aria-label="Open ${edition.title} reader">
         <div class="paper-fallback">Loading page 1</div>
         <div class="paper-toast" hidden></div>
       </div>
@@ -1372,6 +1620,11 @@ function createPaperCard(edition, slot) {
     const img = event.currentTarget;
     if (!img.classList.contains("is-visible") || !img.src) return;
     openLightbox(edition.id, img.src, img.alt);
+  });
+  card.querySelector(".paper-image").addEventListener("keydown", (event) => {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    event.currentTarget.click();
   });
 
   return card;
@@ -1395,11 +1648,13 @@ function applySuccessfulPaperLoad(card, edition, state, targetPage, url) {
 function handlePaperLoadFailure(card, state, targetPage) {
   if (!card.isConnected) return;
   state.loading = false;
-  state.page = state.hasLoaded ? state.lastSuccessfulPage : 1;
+  // Keep the navigation cursor on the failed page. The previous successful
+  // image remains visible, while Next can continue to targetPage + 1.
+  state.page = targetPage;
   updatePaperControls(card, state);
 
   if (!state.hasLoaded) {
-    setPaperFallback(card, "Issue unavailable");
+    setPaperFallback(card, targetPage === 1 ? "Issue unavailable" : `Page ${targetPage} unavailable`);
     return;
   }
 
@@ -1412,7 +1667,6 @@ function loadPaperPage(card, edition, date, state, targetPage) {
   state.loading = true;
   state.page = targetPage;
   updatePaperControls(card, state);
-  const url = buildFrontPageUrl(edition, date, targetPage);
   // Request ids make rapid paging safe by preventing old image loads from winning the race.
   const requestId = state.requestId + 1;
   state.requestId = requestId;
@@ -1423,17 +1677,15 @@ function loadPaperPage(card, edition, date, state, targetPage) {
     setPaperFallback(card, `Loading page ${targetPage}`);
   }
 
-  const probe = new Image();
-  probe.decoding = "async";
-  probe.onload = () => {
-    if (state.requestId !== requestId) return;
-    applySuccessfulPaperLoad(card, edition, state, targetPage, url);
-  };
-  probe.onerror = () => {
-    if (state.requestId !== requestId) return;
-    handlePaperLoadFailure(card, state, targetPage);
-  };
-  probe.src = url;
+  loadPageImageWithFallback(edition, date, targetPage)
+    .then((url) => {
+      if (state.requestId !== requestId) return;
+      applySuccessfulPaperLoad(card, edition, state, targetPage, url);
+    })
+    .catch(() => {
+      if (state.requestId !== requestId) return;
+      handlePaperLoadFailure(card, state, targetPage);
+    });
 }
 
 function changePaperPage(editionId, delta) {
@@ -1454,8 +1706,161 @@ function changeAllVisiblePaperPages(delta) {
   });
 }
 
-function renderShelf(date) {
+function updateMobilePaperUi(paper, state) {
+  if (!paper || !state) return;
+  const previous = paper.querySelector('[data-mobile-action="prev"]');
+  const next = paper.querySelector('[data-mobile-action="next"]');
+  const label = paper.querySelector(".mobile-page-label");
+  previous.disabled = state.loading || state.page <= 1;
+  next.disabled = state.loading;
+  label.textContent = `Page ${state.page}`;
+  paper.classList.toggle("is-changing", state.loading);
+}
+
+function setMobilePaperStatus(paper, message, isError = false) {
+  const status = paper.querySelector(".mobile-paper-status");
+  status.textContent = message;
+  status.hidden = !message;
+  status.classList.toggle("is-error", isError);
+}
+
+function getMobilePageCacheKey(editionId, date, page) {
+  return `${editionId}:${date}:${page}`;
+}
+
+function loadCachedMobilePage(edition, date, page) {
+  const key = getMobilePageCacheKey(edition.id, date, page);
+  if (mobilePagePrefetchCache.has(key)) return mobilePagePrefetchCache.get(key);
+  const request = loadPageImageWithFallback(edition, date, page)
+    .catch((error) => {
+      // Failed lookahead requests are removable so a later explicit navigation
+      // can retry instead of inheriting a permanently rejected cache entry.
+      mobilePagePrefetchCache.delete(key);
+      throw error;
+    });
+  mobilePagePrefetchCache.set(key, request);
+  return request;
+}
+
+function prefetchNextMobilePage(edition, date, page) {
+  loadCachedMobilePage(edition, date, page + 1).catch(() => {
+    // Lookahead failure is silent; normal navigation owns user-facing errors.
+  });
+}
+
+function loadMobilePaperPage(editionId, targetPage) {
+  const edition = getEditionById(editionId);
+  const state = mobilePageStateByEditionId.get(editionId);
+  const paper = els.mobileReader.querySelector(`[data-edition-id="${editionId}"]`);
+  if (!edition || !state || !paper || state.loading) return;
+
+  const page = Math.max(1, targetPage);
+  if (page === state.page && state.hasLoaded) return;
+  state.loading = true;
+  state.page = page;
+  const requestId = state.requestId + 1;
+  state.requestId = requestId;
+  updateMobilePaperUi(paper, state);
+  setMobilePaperStatus(paper, `Loading page ${page}`);
+
+  const requestDate = currentDate;
+  loadCachedMobilePage(edition, requestDate, page)
+    .then((url) => {
+      if (state.requestId !== requestId || !paper.isConnected) return;
+      const image = paper.querySelector(".mobile-paper-image");
+      state.loading = false;
+      state.page = page;
+      state.lastSuccessfulPage = page;
+      state.hasLoaded = true;
+      image.src = url;
+      image.alt = buildPageAltText(edition, page);
+      image.classList.add("is-visible");
+      setMobilePaperStatus(paper, "");
+      updateMobilePaperUi(paper, state);
+      prefetchNextMobilePage(edition, requestDate, page);
+    })
+    .catch(() => {
+      if (state.requestId !== requestId || !paper.isConnected) return;
+      state.loading = false;
+      state.page = page;
+      setMobilePaperStatus(paper, page === 1 && !state.hasLoaded ? "Issue unavailable" : `Page ${page} unavailable`, true);
+      updateMobilePaperUi(paper, state);
+    });
+}
+
+function changeMobilePaperPage(editionId, delta) {
+  const state = mobilePageStateByEditionId.get(editionId);
+  if (!state || state.loading) return;
+  const targetPage = Math.max(1, state.page + delta);
+  if (targetPage === state.page) return;
+  loadMobilePaperPage(editionId, targetPage);
+}
+
+function renderMobileReader(initialEditionIndex = 0) {
+  mobileRenderId += 1;
+  const renderId = mobileRenderId;
+  if (mobileReaderObserver) {
+    mobileReaderObserver.disconnect();
+    mobileReaderObserver = null;
+  }
+  const clampedInitialIndex = Math.min(Math.max(0, initialEditionIndex), Math.max(0, currentEditions.length - 1));
+  mobileActiveEditionIndex = clampedInitialIndex;
+  mobilePagePrefetchCache = new Map();
+  mobilePageStateByEditionId = new Map(currentEditions.map((edition) => [edition.id, createPageState()]));
+  els.mobileReader.innerHTML = "";
+  els.mobileReader.scrollTop = 0;
+
+  currentEditions.forEach((edition, index) => {
+    const paper = document.createElement("article");
+    paper.className = "mobile-paper";
+    paper.dataset.editionId = edition.id;
+    paper.dataset.editionIndex = String(index);
+    paper.setAttribute("aria-label", `${edition.title}, newspaper ${index + 1} of ${currentEditions.length}`);
+    paper.innerHTML = `
+      <div class="mobile-paper-topline">
+        <span>${edition.title}</span>
+        <span class="mobile-paper-position">${index + 1} of ${currentEditions.length}</span>
+      </div>
+      <img class="mobile-paper-image" alt="">
+      <div class="mobile-paper-status" role="status">Loading page 1</div>
+      <div class="mobile-paper-controls" aria-label="Page controls for ${edition.title}">
+        <button class="mobile-page-button" type="button" data-mobile-action="prev" aria-label="Previous page for ${edition.title}">&lsaquo;</button>
+        <span class="mobile-page-label">Page 1</span>
+        <button class="mobile-page-button" type="button" data-mobile-action="next" aria-label="Next page for ${edition.title}">&rsaquo;</button>
+      </div>
+    `;
+    paper.querySelector('[data-mobile-action="prev"]').addEventListener("click", () => changeMobilePaperPage(edition.id, -1));
+    paper.querySelector('[data-mobile-action="next"]').addEventListener("click", () => changeMobilePaperPage(edition.id, 1));
+    els.mobileReader.appendChild(paper);
+  });
+
+  // Day-to-day navigation keeps the same vertical newspaper position even
+  // when the edition lineup changes (for example, Friday to Saturday).
+  if (isMobileMode() && clampedInitialIndex > 0) {
+    els.mobileReader.scrollTop = clampedInitialIndex * els.mobileReader.clientHeight;
+  }
+
+  mobileReaderObserver = new IntersectionObserver((entries) => {
+    const visible = entries
+      .filter((entry) => entry.isIntersecting)
+      .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+    if (!visible) return;
+    mobileActiveEditionIndex = Number(visible.target.dataset.editionIndex) || 0;
+  }, { root: els.mobileReader, threshold: [0.55, 0.75] });
+  els.mobileReader.querySelectorAll(".mobile-paper").forEach((paper) => mobileReaderObserver.observe(paper));
+
+  if (!isMobileMode()) return;
+  currentEditions.forEach((edition) => {
+    if (renderId !== mobileRenderId) return;
+    loadMobilePaperPage(edition.id, 1);
+  });
+}
+
+function renderShelf(date, options = {}) {
   // Changing the date rebuilds the shelf from scratch because the set of editions can change by weekday.
+  const initialMobileEditionIndex = options.preserveMobileEdition
+    ? mobileActiveEditionIndex
+    : 0;
   clearPageTimers();
   currentDate = date;
   currentAvailableEditions = resolveEditionsForDate(date);
@@ -1471,22 +1876,26 @@ function renderShelf(date) {
     els.shelf.appendChild(card);
   });
 
-  currentEditions.forEach((edition) => {
-    const state = pageStateByEditionId.get(edition.id);
-    const card = els.shelf.querySelector(`[data-edition-id="${edition.id}"]`);
-    updatePaperControls(card, state);
-    loadPaperPage(card, edition, currentDate, state, 1);
-  });
+  renderMobileReader(initialMobileEditionIndex);
+
+  if (!isMobileMode()) {
+    currentEditions.forEach((edition) => {
+      const state = pageStateByEditionId.get(edition.id);
+      const card = els.shelf.querySelector(`[data-edition-id="${edition.id}"]`);
+      updatePaperControls(card, state);
+      loadPaperPage(card, edition, currentDate, state, 1);
+    });
+  }
 }
 
-function renderCurrentDate() {
-  renderShelf(els.editionDate.value);
+function renderCurrentDate(options = {}) {
+  renderShelf(els.editionDate.value, options);
 }
 
 els.editionDate.value = currentDate;
 els.prevDay.addEventListener("click", () => {
   els.editionDate.value = shiftDate(els.editionDate.value, -1);
-  renderCurrentDate();
+  renderCurrentDate({ preserveMobileEdition: true });
 });
 els.todayBtn.addEventListener("click", () => {
   els.editionDate.value = formatNzDate(new Date());
@@ -1494,7 +1903,7 @@ els.todayBtn.addEventListener("click", () => {
 });
 els.nextDay.addEventListener("click", () => {
   els.editionDate.value = shiftDate(els.editionDate.value, 1);
-  renderCurrentDate();
+  renderCurrentDate({ preserveMobileEdition: true });
 });
 els.editionDate.addEventListener("change", renderCurrentDate);
 els.settingsToggle.addEventListener("click", (event) => {
@@ -1506,6 +1915,9 @@ els.settingsToggle.addEventListener("click", (event) => {
 });
 els.settingsMenu.addEventListener("click", (event) => {
   event.stopPropagation();
+});
+document.addEventListener("click", () => {
+  if (!els.settingsPanel.hidden) setSettingsOpen(false);
 });
 els.lightboxPrev.addEventListener("click", () => {
   changeLightboxPage(-1);
@@ -1519,6 +1931,36 @@ els.lightbox.addEventListener("click", (event) => {
     closeLightbox();
   }
 });
+
+// The phone surface lets the browser own vertical scrolling and interprets only
+// clearly horizontal single-finger gestures as page changes.
+let mobileTouchStartX = 0;
+let mobileTouchStartY = 0;
+let mobileTouchEditionId = null;
+els.mobileReader.addEventListener("touchstart", (event) => {
+  if (event.touches.length !== 1) {
+    mobileTouchEditionId = null;
+    return;
+  }
+  const paper = event.target.closest(".mobile-paper");
+  if (!paper) return;
+  mobileTouchStartX = event.touches[0].clientX;
+  mobileTouchStartY = event.touches[0].clientY;
+  mobileTouchEditionId = paper.dataset.editionId;
+}, { passive: true });
+els.mobileReader.addEventListener("touchend", (event) => {
+  if (!mobileTouchEditionId || !event.changedTouches.length) return;
+  const editionId = mobileTouchEditionId;
+  mobileTouchEditionId = null;
+  const touch = event.changedTouches[0];
+  const dx = touch.clientX - mobileTouchStartX;
+  const dy = touch.clientY - mobileTouchStartY;
+  if (Math.abs(dx) < 44 || Math.abs(dx) < Math.abs(dy) * 1.25) return;
+  changeMobilePaperPage(editionId, dx < 0 ? 1 : -1);
+}, { passive: true });
+els.mobileReader.addEventListener("touchcancel", () => {
+  mobileTouchEditionId = null;
+}, { passive: true });
 
 // Horizontal swipe pages the reader on touch devices; pinch (multi-touch) is ignored so zoom still works.
 let touchStartX = 0;
@@ -1559,6 +2001,23 @@ document.addEventListener("keydown", (event) => {
     changeLightboxPage(1);
     return;
   }
+  if (event.key === "Escape" && !els.lightbox.hidden) {
+    closeLightbox();
+    return;
+  }
+  if (!els.lightbox.hidden && event.key === "Tab") {
+    const focusable = [els.lightboxPrev, els.lightboxNext, els.lightboxClose].filter((item) => !item.disabled);
+    const currentIndex = focusable.indexOf(document.activeElement);
+    const nextIndex = event.shiftKey
+      ? (currentIndex <= 0 ? focusable.length - 1 : currentIndex - 1)
+      : (currentIndex < 0 || currentIndex === focusable.length - 1 ? 0 : currentIndex + 1);
+    event.preventDefault();
+    focusable[nextIndex].focus();
+    return;
+  }
+  if (event.target instanceof HTMLInputElement || event.target instanceof HTMLButtonElement || event.target?.getAttribute("role") === "button") {
+    return;
+  }
   if (els.lightbox.hidden && (event.key === "ArrowLeft" || event.key === "Left")) {
     event.preventDefault();
     changeAllVisiblePaperPages(-1);
@@ -1569,9 +2028,12 @@ document.addEventListener("keydown", (event) => {
     changeAllVisiblePaperPages(1);
     return;
   }
-  if (event.key === "Escape" && !els.lightbox.hidden) {
-    closeLightbox();
-  }
+});
+
+const mobileModeQuery = window.matchMedia("(max-width: 700px), (max-height: 500px) and (pointer: coarse)");
+mobileModeQuery.addEventListener("change", () => {
+  closeLightbox();
+  renderShelf(currentDate);
 });
 
 renderShelf(currentDate);
