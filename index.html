@@ -1187,6 +1187,11 @@ function isMobileMode() {
 }
 
 function syncMobileViewportHeight() {
+  // Pinch zoom also changes visualViewport.height. Reflowing the app to that
+  // temporary magnified height fights Safari's native zoom and makes the page
+  // appear to resize under the user's fingers. Keep the last 1x layout height
+  // until the user returns to the normal zoom scale.
+  if (window.visualViewport && window.visualViewport.scale > 1.01) return;
   const viewportHeight = window.visualViewport?.height || window.innerHeight;
   document.documentElement.style.setProperty("--mobile-viewport-height", `${Math.round(viewportHeight)}px`);
 }
@@ -1959,6 +1964,11 @@ els.mobileReader.addEventListener("touchstart", (event) => {
   mobileTouchStartX = event.touches[0].clientX;
   mobileTouchStartY = event.touches[0].clientY;
   mobileTouchEditionId = paper.dataset.editionId;
+}, { passive: true });
+els.mobileReader.addEventListener("touchmove", (event) => {
+  // Once a second finger joins, this interaction is a pinch/pan gesture and
+  // must never turn into a page change when either finger is released.
+  if (event.touches.length !== 1) mobileTouchEditionId = null;
 }, { passive: true });
 els.mobileReader.addEventListener("touchend", (event) => {
   if (!mobileTouchEditionId || !event.changedTouches.length) return;

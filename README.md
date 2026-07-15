@@ -157,6 +157,7 @@ The layout has three general breakpoints at `1080px`, `860px`, and `520px`, plus
 - Page position is stored independently for each newspaper, so returning vertically to a paper restores the page that was being read.
 - After a page loads, the next page for that newspaper is prefetched into a mobile-only request cache so the following horizontal navigation can reuse an in-flight or completed load.
 - Clearly horizontal gestures are required before paging; vertical and diagonal motion stays with the native vertical scroller, and multi-touch gestures are ignored.
+- Native pinch zoom remains available. While magnified, visual-viewport height changes are ignored so Safari zooms the newspaper without reflowing the mobile shell, and any gesture that becomes multi-touch is cancelled as a page swipe.
 - Each paper includes visible previous/next page buttons so gestures are not the only navigation method.
 - Loading, unavailable-page, newspaper-position, and current-page states appear directly over the active paper.
 - The three day-navigation buttons share a single row (`flex: 1 1 0`) so the control bar stays two rows tall (date picker + buttons).
